@@ -28,7 +28,6 @@ export default function RootLayout() {
   useEffect(() => {
     if (loading) return;
 
-    const inTabs = segments[0] === "(tabs)";
     const inAuthPage = segments[0] === "login" || segments[0] === "register";
 
     if (!session && !inAuthPage) {
