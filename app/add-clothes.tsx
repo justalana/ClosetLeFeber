@@ -83,6 +83,13 @@ export default function AddClothesScreen() {
       }
       console.log("Current user:", user?.id);
 
+      console.log("Insert data:", {
+        user_id: user.id,
+        name: name.trim() || null,
+        category,
+        image_url: imageUrl,
+      });
+
       const { error } = await supabase.from("clothes").insert({
         user_id: user.id,
         name: name.trim() || null,
