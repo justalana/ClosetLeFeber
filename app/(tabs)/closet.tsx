@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -24,9 +24,11 @@ export default function ClosetScreen() {
   const [clothes, setClothes] = useState<ClothingItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadClothes();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadClothes();
+    }, []),
+  );
 
   async function loadClothes() {
     try {
@@ -140,7 +142,10 @@ export default function ClosetScreen() {
         contentContainerStyle={styles.grid}
         columnWrapperStyle={styles.row}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => router.push(`/clothing/${item.id}` as any)}
+          >
             <Image
               source={{ uri: getImageUrl(item.image_url) }}
               style={styles.image}
@@ -156,11 +161,14 @@ export default function ClosetScreen() {
 
             <TouchableOpacity
               style={styles.logButton}
-              onPress={() => logClothingWear(item.id)}
+              onPress={(event) => {
+                event.stopPropagation();
+                logClothingWear(item.id);
+              }}
             >
               <Text style={styles.logButtonText}>Log</Text>
             </TouchableOpacity>
-          </View>
+          </TouchableOpacity>
         )}
       />
 
