@@ -105,6 +105,7 @@ export default function ClosetScreen() {
       .publicUrl;
   }
 
+  // Vervang je huidige logClothingWear() functie door deze versie
   async function logClothingWear(clothingId: string) {
     try {
       const {
@@ -113,20 +114,53 @@ export default function ClosetScreen() {
 
       if (!user) return;
 
-      const { error } = await supabase.from("clothing_wear_logs").insert({
-        clothing_id: clothingId,
-        user_id: user.id,
-        worn_at: new Date().toISOString(),
-      });
+      // 1. Voeg een nieuwe wear log toe
+      const { error: insertError } = await supabase
+        .from("clothing_wear_logs")
+        .insert({
+          clothing_id: clothingId,
+          user_id: user.id,
+          worn_at: new Date().toISOString(),
+        });
 
-      if (error) {
-        console.log("Error logging clothing:", error.message);
+      if (insertError) {
+        console.log("Error logging clothing:", insertError.message);
         alert("Kon kledingstuk niet loggen.");
         return;
       }
 
-      alert("Kledingstuk gelogd!");
+      // 2. Haal het huidige times_worn aantal op
+      const { data: clothingData, error: fetchError } = await supabase
+        .from("clothes")
+        .select("times_worn")
+        .eq("id", clothingId)
+        .single();
+
+      if (fetchError) {
+        console.log("Error fetching times_worn:", fetchError.message);
+        return;
+      }
+
+      // 3. Verhoog het aantal met 1
+      const currentTimesWorn = clothingData?.times_worn || 0;
+
+      const { error: updateError } = await supabase
+        .from("clothes")
+        .update({
+          times_worn: currentTimesWorn + 1,
+          last_worn: new Date().toISOString(), // meteen ook last_worn updaten
+        })
+        .eq("id", clothingId);
+
+      if (updateError) {
+        console.log("Error updating times_worn:", updateError.message);
+        return;
+      }
+
+      // 4. Herlaad de lijst zodat de UI direct bijgewerkt wordt
       loadClothes();
+
+      alert("Kledingstuk gelogd!");
     } catch (err) {
       console.log(err);
       alert("Er ging iets mis.");
