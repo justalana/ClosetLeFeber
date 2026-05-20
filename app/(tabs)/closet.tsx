@@ -38,29 +38,50 @@ export default function ClosetScreen() {
 
       if (!user) return;
 
-      const { data, error } = await supabase
+      // Haal alle kledingstukken op
+      const { data: clothesData, error: clothesError } = await supabase
         .from("clothes")
-        .select("id, name, image_url, last_worn")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        .select("id, name, image_url")
+        .eq("user_id", user.id);
 
-      if (error) {
-        console.log("Error loading clothes:", error.message);
-        return;
-      }
+      if (clothesError) throw clothesError;
 
-      setClothes(data || []);
+      // Voor elk kledingstuk zoeken we de meest recente wear log
+      const clothesWithLastWorn = await Promise.all(
+        (clothesData || []).map(async (item) => {
+          const { data: wearLog } = await supabase
+            .from("clothing_wear_logs")
+            .select("worn_at")
+            .eq("clothing_id", item.id)
+            .order("worn_at", { ascending: false })
+            .limit(1)
+            .single();
+
+          return {
+            ...item,
+            last_worn: wearLog?.worn_at || null,
+          };
+        }),
+      );
+
+      setClothes(clothesWithLastWorn);
+    } catch (error) {
+      console.log("Error loading clothes:", error);
+      alert("Kon kledingstukken niet laden.");
     } finally {
       setLoading(false);
     }
   }
 
-  function formatDate(date: string | null) {
-    if (!date) return "Never worn";
+  // Gebruik deze helper om de datum netjes te tonen
+  function formatDate(dateString: string | null) {
+    if (!dateString) return "Nog nooit gedragen";
 
-    return new Date(date).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
+    const date = new Date(dateString);
+
+    return date.toLocaleDateString("nl-NL", {
+      day: "numeric",
+      month: "long",
       year: "numeric",
     });
   }
@@ -82,6 +103,34 @@ export default function ClosetScreen() {
       .publicUrl;
   }
 
+  async function logClothingWear(clothingId: string) {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      const { error } = await supabase.from("clothing_wear_logs").insert({
+        clothing_id: clothingId,
+        user_id: user.id,
+        worn_at: new Date().toISOString(),
+      });
+
+      if (error) {
+        console.log("Error logging clothing:", error.message);
+        alert("Kon kledingstuk niet loggen.");
+        return;
+      }
+
+      alert("Kledingstuk gelogd!");
+      loadClothes();
+    } catch (err) {
+      console.log(err);
+      alert("Er ging iets mis.");
+    }
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -101,7 +150,16 @@ export default function ClosetScreen() {
               {item.name || "Unnamed"}
             </Text>
 
-            <Text style={styles.date}>{formatDate(item.last_worn)}</Text>
+            <Text style={styles.date}>
+              Laatst gedragen: {formatDate(item.last_worn)}
+            </Text>
+
+            <TouchableOpacity
+              style={styles.logButton}
+              onPress={() => logClothingWear(item.id)}
+            >
+              <Text style={styles.logButtonText}>Log</Text>
+            </TouchableOpacity>
           </View>
         )}
       />
@@ -167,5 +225,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  logButton: {
+    backgroundColor: "#2f2f2f",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginTop: 8,
+    alignItems: "center",
+  },
+  logButtonText: {
+    color: "#fff",
+    fontWeight: "600",
   },
 });
