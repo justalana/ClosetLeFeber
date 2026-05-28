@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
@@ -150,10 +149,6 @@ export default function OutfitScreen() {
           <Text style={styles.subtitle}>
             Deze kledingstukken verdienen vandaag wat aandacht.
           </Text>
-        </View>
-
-        <View style={styles.iconCircle}>
-          <Ionicons name="sparkles-outline" size={24} color="#A66A4C" />
         </View>
       </View>
 

@@ -5,6 +5,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -19,11 +20,32 @@ type ClothingItem = {
   last_worn: string | null;
 };
 
+type MonthlyWear = {
+  month: string;
+  count: number;
+};
+
+const MONTHS = [
+  "Jan",
+  "Feb",
+  "Mrt",
+  "Apr",
+  "Mei",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Okt",
+  "Nov",
+  "Dec",
+];
+
 export default function ClothingDetailScreen() {
-  const { id } = useLocalSearchParams();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
 
   const [item, setItem] = useState<ClothingItem | null>(null);
+  const [monthlyWear, setMonthlyWear] = useState<MonthlyWear[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -55,7 +77,31 @@ export default function ClothingDetailScreen() {
         .eq("clothing_id", id)
         .order("worn_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
+
+      const currentYear = new Date().getFullYear();
+
+      const { data: yearLogs, error: yearLogsError } = await supabase
+        .from("clothing_wear_logs")
+        .select("worn_at")
+        .eq("clothing_id", id)
+        .eq("user_id", user.id)
+        .gte("worn_at", `${currentYear}-01-01`)
+        .lt("worn_at", `${currentYear + 1}-01-01`);
+
+      if (yearLogsError) throw yearLogsError;
+
+      const monthlyCounts = MONTHS.map((month, index) => {
+        const count =
+          yearLogs?.filter((log) => {
+            const date = new Date(log.worn_at);
+            return date.getMonth() === index;
+          }).length || 0;
+
+        return { month, count };
+      });
+
+      setMonthlyWear(monthlyCounts);
 
       setItem({
         ...clothingData,
@@ -134,6 +180,40 @@ export default function ClothingDetailScreen() {
     });
   }
 
+  function WearChart({ data }: { data: MonthlyWear[] }) {
+    const maxCount = Math.max(...data.map((item) => item.count), 1);
+
+    return (
+      <View style={styles.chartCard}>
+        <View style={styles.chartHeader}>
+          <Text style={styles.chartTitle}>Gedragen dit jaar</Text>
+          <Text style={styles.chartSubtitle}>Aantal logs per maand</Text>
+        </View>
+
+        <View style={styles.chart}>
+          {data.map((item) => (
+            <View key={item.month} style={styles.chartItem}>
+              <Text style={styles.chartCount}>{item.count}</Text>
+
+              <View style={styles.barBackground}>
+                <View
+                  style={[
+                    styles.bar,
+                    {
+                      height: `${(item.count / maxCount) * 100}%`,
+                    },
+                  ]}
+                />
+              </View>
+
+              <Text style={styles.chartLabel}>{item.month}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    );
+  }
+
   if (loading) {
     return (
       <View style={styles.center}>
@@ -151,7 +231,7 @@ export default function ClothingDetailScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Ionicons name="arrow-back" size={24} color="#2f2f2f" />
       </TouchableOpacity>
@@ -160,9 +240,12 @@ export default function ClothingDetailScreen() {
 
       <Text style={styles.name}>{item.name || "Naamloos kledingstuk"}</Text>
 
-      <Text style={styles.date}>
-        Laatst gedragen: {formatDate(item.last_worn)}
-      </Text>
+      <View style={styles.statCard}>
+        <Text style={styles.statLabel}>Laatst gedragen</Text>
+        <Text style={styles.statValue}>{formatDate(item.last_worn)}</Text>
+      </View>
+
+      <WearChart data={monthlyWear} />
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.logButton} onPress={logClothingWear}>
@@ -176,15 +259,19 @@ export default function ClothingDetailScreen() {
           <Text style={styles.buttonText}>Verwijderen</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: "#fff",
+  },
+
+  content: {
+    padding: 20,
+    paddingBottom: 40,
   },
 
   center: {
@@ -211,14 +298,90 @@ const styles = StyleSheet.create({
     color: "#2f2f2f",
   },
 
-  date: {
-    fontSize: 16,
-    color: "#666",
+  statCard: {
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 18,
+    backgroundColor: "#f3f0ea",
+  },
+
+  statLabel: {
+    fontSize: 13,
+    color: "#777",
+    marginBottom: 4,
+  },
+
+  statValue: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#2f2f2f",
+  },
+
+  chartCard: {
+    marginTop: 18,
+    padding: 16,
+    borderRadius: 18,
+    backgroundColor: "#f3f0ea",
+  },
+
+  chartHeader: {
+    marginBottom: 16,
+  },
+
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#2f2f2f",
+  },
+
+  chartSubtitle: {
+    fontSize: 13,
+    color: "#777",
+    marginTop: 2,
+  },
+
+  chart: {
+    height: 180,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
+
+  chartItem: {
+    alignItems: "center",
+    flex: 1,
+  },
+
+  chartCount: {
+    fontSize: 11,
+    color: "#555",
+    marginBottom: 6,
+  },
+
+  barBackground: {
+    height: 110,
+    width: 12,
+    borderRadius: 999,
+    backgroundColor: "#ddd6cc",
+    justifyContent: "flex-end",
+    overflow: "hidden",
+  },
+
+  bar: {
+    width: "100%",
+    minHeight: 2,
+    borderRadius: 999,
+    backgroundColor: "#2f2f2f",
+  },
+
+  chartLabel: {
+    fontSize: 10,
+    color: "#777",
     marginTop: 8,
   },
 
   buttonContainer: {
-    marginTop: "auto",
+    marginTop: 24,
     gap: 12,
   },
 

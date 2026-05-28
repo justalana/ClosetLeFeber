@@ -7,6 +7,7 @@ import {
   Image,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -16,13 +17,20 @@ type ClothingItem = {
   id: string;
   name: string | null;
   image_url: string;
+  category: string | null;
   last_worn: string | null;
 };
 
+const categories = ["Top", "Bottom", "Dress", "Jacket", "Shoes", "Accessory"];
+
 export default function ClosetScreen() {
   const router = useRouter();
+
   const [clothes, setClothes] = useState<ClothingItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -40,15 +48,13 @@ export default function ClosetScreen() {
 
       if (!user) return;
 
-      // Haal alle kledingstukken op
       const { data: clothesData, error: clothesError } = await supabase
         .from("clothes")
-        .select("id, name, image_url")
+        .select("id, name, image_url, category")
         .eq("user_id", user.id);
 
       if (clothesError) throw clothesError;
 
-      // Voor elk kledingstuk zoeken we de meest recente wear log
       const clothesWithLastWorn = await Promise.all(
         (clothesData || []).map(async (item) => {
           const { data: wearLog } = await supabase
@@ -75,7 +81,26 @@ export default function ClosetScreen() {
     }
   }
 
-  // Gebruik deze helper om de datum netjes te tonen
+  function toggleCategory(category: string) {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((item) => item !== category)
+        : [...prev, category],
+    );
+  }
+
+  const filteredClothes = clothes.filter((item) => {
+    const matchesSearch =
+      searchQuery.trim().length === 0 ||
+      item.name?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesCategory =
+      selectedCategories.length === 0 ||
+      selectedCategories.includes(item.category || "");
+
+    return matchesSearch && matchesCategory;
+  });
+
   function formatDate(dateString: string | null) {
     if (!dateString) return "Nog nooit gedragen";
 
@@ -88,14 +113,6 @@ export default function ClosetScreen() {
     });
   }
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
-  }
-
   function getImageUrl(imageUrl: string) {
     if (imageUrl.startsWith("http")) {
       return imageUrl;
@@ -105,7 +122,6 @@ export default function ClosetScreen() {
       .publicUrl;
   }
 
-  // Vervang je huidige logClothingWear() functie door deze versie
   async function logClothingWear(clothingId: string) {
     try {
       const {
@@ -114,7 +130,6 @@ export default function ClosetScreen() {
 
       if (!user) return;
 
-      // 1. Voeg een nieuwe wear log toe
       const { error: insertError } = await supabase
         .from("clothing_wear_logs")
         .insert({
@@ -129,7 +144,6 @@ export default function ClosetScreen() {
         return;
       }
 
-      // 2. Haal het huidige times_worn aantal op
       const { data: clothingData, error: fetchError } = await supabase
         .from("clothes")
         .select("times_worn")
@@ -141,14 +155,13 @@ export default function ClosetScreen() {
         return;
       }
 
-      // 3. Verhoog het aantal met 1
       const currentTimesWorn = clothingData?.times_worn || 0;
 
       const { error: updateError } = await supabase
         .from("clothes")
         .update({
           times_worn: currentTimesWorn + 1,
-          last_worn: new Date().toISOString(), // meteen ook last_worn updaten
+          last_worn: new Date().toISOString(),
         })
         .eq("id", clothingId);
 
@@ -157,9 +170,7 @@ export default function ClosetScreen() {
         return;
       }
 
-      // 4. Herlaad de lijst zodat de UI direct bijgewerkt wordt
       loadClothes();
-
       alert("Kledingstuk gelogd!");
     } catch (err) {
       console.log(err);
@@ -167,14 +178,46 @@ export default function ClosetScreen() {
     }
   }
 
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
+      <View style={styles.searchRow}>
+        <TouchableOpacity
+          style={styles.filterButton}
+          onPress={() => setFilterOpen(true)}
+        >
+          <Ionicons name="filter-outline" size={28} color="#2F2F2F" />
+        </TouchableOpacity>
+
+        <View style={styles.searchBox}>
+          <TextInput
+            placeholder="Zoeken..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            style={styles.searchInput}
+            placeholderTextColor="#777"
+          />
+
+          <Ionicons name="search-outline" size={22} color="#2F2F2F" />
+        </View>
+      </View>
+
       <FlatList
-        data={clothes}
+        data={filteredClothes}
         keyExtractor={(item) => item.id}
         numColumns={3}
         contentContainerStyle={styles.grid}
         columnWrapperStyle={styles.row}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>Geen kledingstukken gevonden.</Text>
+        }
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.card}
@@ -206,6 +249,52 @@ export default function ClosetScreen() {
         )}
       />
 
+      {filterOpen && (
+        <View style={styles.filterPanel}>
+          <View style={styles.filterHeader}>
+            <View style={styles.filterTitleRow}>
+              <Ionicons name="filter-outline" size={20} color="#2F2F2F" />
+              <Text style={styles.filterTitle}>Filters</Text>
+            </View>
+
+            <TouchableOpacity onPress={() => setFilterOpen(false)}>
+              <Ionicons name="chevron-back" size={28} color="#2F2F2F" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.filterSection}>
+            <Text style={styles.filterSectionTitle}>Soort</Text>
+
+            {categories.map((category) => (
+              <TouchableOpacity
+                key={category}
+                style={styles.checkboxRow}
+                onPress={() => toggleCategory(category)}
+              >
+                <Ionicons
+                  name={
+                    selectedCategories.includes(category)
+                      ? "checkbox"
+                      : "square-outline"
+                  }
+                  size={22}
+                  color="#3F6473"
+                />
+
+                <Text style={styles.checkboxLabel}>{category}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <TouchableOpacity
+            style={styles.clearFiltersButton}
+            onPress={() => setSelectedCategories([])}
+          >
+            <Text style={styles.clearFiltersText}>Filters wissen</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => router.push("/add-clothes")}
@@ -220,6 +309,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F8F4EF",
+  },
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 8,
+  },
+  filterButton: {
+    width: 38,
+    height: 38,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  searchBox: {
+    flex: 1,
+    height: 40,
+    borderRadius: 22,
+    backgroundColor: "#E7E2DC",
+    borderWidth: 1,
+    borderColor: "#2F2F2F",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 14,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: "#2F2F2F",
+    paddingVertical: 0,
   },
   grid: {
     padding: 16,
@@ -251,6 +371,73 @@ const styles = StyleSheet.create({
     marginTop: 2,
     fontSize: 11,
     color: "#777",
+  },
+  emptyText: {
+    textAlign: "center",
+    marginTop: 40,
+    color: "#777",
+    fontSize: 15,
+  },
+  filterPanel: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    bottom: 0,
+    width: "58%",
+    backgroundColor: "#F1EEE9",
+    borderRightWidth: 1,
+    borderColor: "#2F2F2F",
+    paddingTop: 18,
+    paddingHorizontal: 14,
+    zIndex: 10,
+  },
+  filterHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 18,
+  },
+  filterTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  filterTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#2F2F2F",
+  },
+  filterSection: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 12,
+  },
+  filterSectionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 8,
+    color: "#2F2F2F",
+  },
+  checkboxRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 8,
+  },
+  checkboxLabel: {
+    fontSize: 14,
+    color: "#2F2F2F",
+  },
+  clearFiltersButton: {
+    marginTop: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: "#D8CEC3",
+    alignItems: "center",
+  },
+  clearFiltersText: {
+    fontWeight: "600",
+    color: "#2F2F2F",
   },
   addButton: {
     position: "absolute",
