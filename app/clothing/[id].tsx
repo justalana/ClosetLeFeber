@@ -233,9 +233,21 @@ export default function ClothingDetailScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons name="arrow-back" size={24} color="#2f2f2f" />
-      </TouchableOpacity>
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#2f2f2f" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => router.push(`/clothing/edit/${item.id}` as any)}
+        >
+          <Ionicons name="create-outline" size={22} color="#333" />
+        </TouchableOpacity>
+      </View>
 
       <Image source={{ uri: item.image_url }} style={styles.image} />
 
@@ -411,5 +423,20 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "700",
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+
+  editButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: "#F3EFE8",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
