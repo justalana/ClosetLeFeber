@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -25,6 +25,7 @@ const categories = ["Top", "Bottom", "Dress", "Jacket", "Shoes", "Accessory"];
 
 export default function ClosetScreen() {
   const router = useRouter();
+  const { category } = useLocalSearchParams<{ category?: string }>();
 
   const [clothes, setClothes] = useState<ClothingItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,9 +35,21 @@ export default function ClosetScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      if (category) {
+        setSelectedCategories([category]);
+      } else {
+        setSelectedCategories([]);
+      }
+
       loadClothes();
-    }, []),
+    }, [category]),
   );
+
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     loadClothes();
+  //   }, []),
+  // );
 
   async function loadClothes() {
     try {

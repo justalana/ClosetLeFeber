@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs, router } from "expo-router";
-import { Platform, TouchableOpacity } from "react-native";
+import { Image, Platform, TouchableOpacity } from "react-native";
 
 export default function TabLayout() {
   return (
@@ -45,8 +45,16 @@ export default function TabLayout() {
         name="closet"
         options={{
           title: "Closet",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="shirt-outline" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Image
+              source={require("../../assets/images/closet.png")}
+              style={{
+                width: size,
+                height: size,
+                tintColor: color, // zorgt ervoor dat actief/inactief nog werkt
+              }}
+              resizeMode="contain"
+            />
           ),
         }}
       />
@@ -65,8 +73,16 @@ export default function TabLayout() {
         name="outfit"
         options={{
           title: "Outfits",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="sparkles-outline" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Image
+              source={require("../../assets/images/outfit.png")}
+              style={{
+                width: size,
+                height: size,
+                tintColor: color, // zorgt ervoor dat actief/inactief nog werkt
+              }}
+              resizeMode="contain"
+            />
           ),
         }}
       />

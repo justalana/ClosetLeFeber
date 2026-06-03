@@ -1,50 +1,223 @@
-import React from "react";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { supabase } from "../../lib/supabase";
+
+type ClothingItem = {
+  id: string;
+  name: string | null;
+  image_url: string;
+  category: string | null;
+  times_worn: number | null;
+};
+
+const categories = [
+  { label: "Top", image: require("../../assets/images/tshirt.png") },
+  { label: "Bottom", image: require("../../assets/images/jeans.png") },
+  { label: "Dress", image: require("../../assets/images/dress.png") },
+  {
+    label: "Accessories",
+    image: require("../../assets/images/wristwatch.png"),
+  },
+];
 
 export default function HomeScreen() {
+  const router = useRouter();
+
+  const [userName, setUserName] = useState("daar");
+  const [leastWorn, setLeastWorn] = useState<ClothingItem[]>([]);
+  const [mostWornItem, setMostWornItem] = useState<ClothingItem | null>(null);
+  const [leastWornItem, setLeastWornItem] = useState<ClothingItem | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadHomeData();
+    }, []),
+  );
+
+  async function loadHomeData() {
+    try {
+      setLoading(true);
+
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      const name =
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        user.email?.split("@")[0] ||
+        "daar";
+
+      setUserName(name);
+
+      const { data, error } = await supabase
+        .from("clothes")
+        .select("id, name, image_url, category, times_worn")
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      const clothes = data || [];
+
+      const sortedLeastWorn = [...clothes].sort(
+        (a, b) => (a.times_worn || 0) - (b.times_worn || 0),
+      );
+
+      const sortedMostWorn = [...clothes].sort(
+        (a, b) => (b.times_worn || 0) - (a.times_worn || 0),
+      );
+
+      setLeastWorn(sortedLeastWorn.slice(0, 3));
+      setLeastWornItem(sortedLeastWorn[0] || null);
+      setMostWornItem(sortedMostWorn[0] || null);
+    } catch (error) {
+      console.log("Error loading home:", error);
+      alert("Kon homepagina niet laden.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function getImageUrl(imageUrl: string) {
+    if (imageUrl.startsWith("http")) return imageUrl;
+
+    return supabase.storage.from("clothing-images").getPublicUrl(imageUrl).data
+      .publicUrl;
+  }
+
+  function goToCategory(category: string) {
+    router.push({
+      pathname: "/closet",
+      params: { category },
+    } as any);
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.smallText}>Welcome back</Text>
-        <Text style={styles.title}>Your Closet</Text>
+        <Text style={styles.title}>Hey {userName} !</Text>
+        <Text style={styles.quote}>Kleine stapjes geven ook overzicht.</Text>
       </View>
 
-      <View style={styles.statsRow}>
-        <StatCard label="Items" value="24" />
-        <StatCard label="Worn this week" value="6" />
-        <StatCard label="Forgotten" value="3" />
-      </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Vergeet mij niet :(</Text>
 
-      <View style={styles.mainCard}>
-        <Text style={styles.cardTitle}>Need outfit inspiration?</Text>
-        <Text style={styles.cardText}>
-          Let’s help you pick something you haven’t worn in a while.
-        </Text>
+        <View style={styles.forgottenRow}>
+          {leastWorn.map((item) => (
+            <TouchableOpacity
+              key={item.id}
+              style={styles.clothingCard}
+              onPress={() => router.push(`/clothing/${item.id}` as any)}
+            >
+              <Image
+                source={{ uri: getImageUrl(item.image_url) }}
+                style={styles.clothingImage}
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
 
-        <TouchableOpacity style={styles.primaryButton}>
-          <Text style={styles.primaryButtonText}>Suggest an outfit</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push("/outfit" as any)}
+        >
+          <Text style={styles.buttonText}>Kies outfit</Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Categorieën</Text>
+
+          <TouchableOpacity onPress={() => router.push("/closet" as any)}>
+            <Text style={styles.seeAll}>See all</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.categoriesRow}>
+          {categories.map((category) => (
+            <TouchableOpacity
+              key={category.label}
+              style={styles.categoryButton}
+            >
+              <Image
+                source={category.image}
+                style={styles.categoryIcon}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Honourable mentions</Text>
+
+        <View style={styles.mentionsRow}>
+          <MentionCard
+            item={mostWornItem}
+            label="Favoriet"
+            emoji="⭐"
+            getImageUrl={getImageUrl}
+          />
+
+          <MentionCard
+            item={leastWornItem}
+            label="Minst gedragen"
+            emoji="☹️"
+            getImageUrl={getImageUrl}
+          />
+        </View>
       </View>
     </ScrollView>
   );
 }
 
-type StatCardProps = {
+type MentionCardProps = {
+  item: ClothingItem | null;
   label: string;
-  value: string;
+  emoji: string;
+  getImageUrl: (url: string) => string;
 };
 
-function StatCard({ label, value }: StatCardProps) {
+function MentionCard({ item, label, emoji, getImageUrl }: MentionCardProps) {
   return (
-    <View style={styles.statCard}>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
+    <View style={styles.mentionCard}>
+      <Text style={styles.mentionEmoji}>{emoji}</Text>
+
+      {item ? (
+        <Image
+          source={{ uri: getImageUrl(item.image_url) }}
+          style={styles.mentionImage}
+        />
+      ) : (
+        <View style={styles.emptyMention} />
+      )}
+
+      <Text style={styles.mentionLabel}>{label}</Text>
+      <Text style={styles.mentionName} numberOfLines={1}>
+        {item?.name || "Nog geen item"}
+      </Text>
     </View>
   );
 }
@@ -52,79 +225,152 @@ function StatCard({ label, value }: StatCardProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F3EE",
-    padding: 20,
+    backgroundColor: "#F8F4EF",
+  },
+  content: {
+    paddingBottom: 110,
+  },
+  topBar: {
+    height: 68,
+    backgroundColor: "#D9D9D9",
+    paddingHorizontal: 22,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  profileCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: "#2F2F2F",
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
-    marginTop: 50,
-    marginBottom: 24,
-  },
-  smallText: {
-    fontSize: 14,
-    color: "#7D7268",
+    alignItems: "center",
+    marginTop: 26,
+    marginBottom: 26,
   },
   title: {
-    fontSize: 34,
-    fontWeight: "700",
-    color: "#2E2925",
+    fontSize: 28,
+    fontWeight: "600",
+    color: "#111",
   },
-  statsRow: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 20,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: "#FFFFFF",
-    padding: 16,
-    borderRadius: 18,
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#2E2925",
-  },
-  statLabel: {
-    fontSize: 12,
-    color: "#7D7268",
+  quote: {
+    fontSize: 14,
+    color: "#111",
     marginTop: 4,
   },
-  mainCard: {
-    backgroundColor: "#D8C7B8",
-    padding: 22,
-    borderRadius: 24,
+  section: {
+    paddingHorizontal: 28,
+    marginBottom: 30,
   },
-  cardTitle: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#2E2925",
-    marginBottom: 8,
+  sectionTitle: {
+    fontSize: 16,
+    color: "#111",
+    marginBottom: 10,
   },
-  cardText: {
-    fontSize: 15,
-    color: "#4F4740",
-    marginBottom: 18,
-    lineHeight: 22,
+  forgottenRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 14,
+    marginBottom: 14,
   },
-  primaryButton: {
-    backgroundColor: "#2E2925",
-    paddingVertical: 14,
-    borderRadius: 16,
-    alignItems: "center",
+  clothingCard: {
+    width: 78,
+    height: 78,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#111",
+    backgroundColor: "#D9D9D9",
+    overflow: "hidden",
   },
-  primaryButtonText: {
-    color: "#FFFFFF",
-    fontWeight: "600",
-    fontSize: 15,
+  clothingImage: {
+    width: "100%",
+    height: "100%",
   },
   button: {
-    backgroundColor: "#2E2925",
-    padding: 16,
-    borderRadius: 16,
+    backgroundColor: "#D9D9D9",
+    borderRadius: 6,
+    paddingVertical: 8,
     alignItems: "center",
+    marginHorizontal: 38,
   },
   buttonText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
+    color: "#111",
+    fontSize: 15,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  seeAll: {
+    fontSize: 12,
+    color: "#111",
+  },
+  categoryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  categoryButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "#D9D9D9",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  categoryIcon: {
+    width: 38,
+    height: 38,
+  },
+  mentionsRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 24,
+  },
+  mentionCard: {
+    width: 130,
+    alignItems: "center",
+  },
+  mentionEmoji: {
+    fontSize: 28,
+    marginBottom: -8,
+    zIndex: 2,
+  },
+  mentionImage: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: "#D9D9D9",
+  },
+  emptyMention: {
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: "#D9D9D9",
+  },
+  mentionLabel: {
+    marginTop: 8,
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#111",
+  },
+  mentionName: {
+    fontSize: 12,
+    color: "#777",
+    maxWidth: 120,
+  },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  categoriesRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 16,
   },
 });
