@@ -7,6 +7,7 @@ import {
   Alert,
   Image,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -30,6 +31,7 @@ export default function AddClothesScreen() {
   const [category, setCategory] = useState("Top");
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [loading, setLoading] = useState(false);
+  const [season, setSeason] = useState("Alle seizoenen");
 
   async function pickImage() {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -92,8 +94,9 @@ export default function AddClothesScreen() {
 
       const { error } = await supabase.from("clothes").insert({
         user_id: user.id,
-        name: name.trim() || null,
+        name,
         category,
+        season,
         image_url: imageUrl,
       });
 
@@ -111,59 +114,87 @@ export default function AddClothesScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Add clothing item</Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <Text style={styles.title}>Add clothing item</Text>
 
-      <Text style={styles.label}>Name optional</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Black hoodie"
-        value={name}
-        onChangeText={setName}
-      />
+        <Text style={styles.label}>Name optional</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Black hoodie"
+          value={name}
+          onChangeText={setName}
+        />
 
-      <Text style={styles.label}>Category</Text>
-      <View style={styles.categoryGrid}>
-        {categories.map((item) => (
-          <Pressable
-            key={item}
-            style={[
-              styles.categoryButton,
-              category === item && styles.categoryButtonActive,
-            ]}
-            onPress={() => setCategory(item)}
-          >
-            <Text
+        <Text style={styles.label}>Category</Text>
+        <View style={styles.categoryGrid}>
+          {categories.map((item) => (
+            <Pressable
+              key={item}
               style={[
-                styles.categoryText,
-                category === item && styles.categoryTextActive,
+                styles.categoryButton,
+                category === item && styles.categoryButtonActive,
               ]}
+              onPress={() => setCategory(item)}
             >
-              {item}
-            </Text>
-          </Pressable>
-        ))}
+              <Text
+                style={[
+                  styles.categoryText,
+                  category === item && styles.categoryTextActive,
+                ]}
+              >
+                {item}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        <Text style={styles.label}>Season</Text>
+
+        <View style={styles.optionsRow}>
+          {["Lente", "Zomer", "Herfst", "Winter", "Alle seizoenen"].map(
+            (item) => (
+              <Pressable
+                key={item}
+                style={[
+                  styles.optionButton,
+                  season === item && styles.optionButtonActive,
+                ]}
+                onPress={() => setSeason(item)}
+              >
+                <Text
+                  style={[
+                    styles.optionText,
+                    season === item && styles.optionTextActive,
+                  ]}
+                >
+                  {item}
+                </Text>
+              </Pressable>
+            ),
+          )}
+        </View>
+
+        <Text style={styles.label}>Image</Text>
+        <Pressable style={styles.imageButton} onPress={pickImage}>
+          <Text style={styles.imageButtonText}>
+            {image ? "Change image" : "Choose image"}
+          </Text>
+        </Pressable>
+
+        {image && <Image source={{ uri: image.uri }} style={styles.preview} />}
+
+        <Pressable
+          style={[styles.saveButton, loading && styles.saveButtonDisabled]}
+          onPress={addClothingItem}
+          disabled={loading}
+        >
+          <Text style={styles.saveButtonText}>
+            {loading ? "Saving..." : "Save clothing item"}
+          </Text>
+        </Pressable>
       </View>
-
-      <Text style={styles.label}>Image</Text>
-      <Pressable style={styles.imageButton} onPress={pickImage}>
-        <Text style={styles.imageButtonText}>
-          {image ? "Change image" : "Choose image"}
-        </Text>
-      </Pressable>
-
-      {image && <Image source={{ uri: image.uri }} style={styles.preview} />}
-
-      <Pressable
-        style={[styles.saveButton, loading && styles.saveButtonDisabled]}
-        onPress={addClothingItem}
-        disabled={loading}
-      >
-        <Text style={styles.saveButtonText}>
-          {loading ? "Saving..." : "Save clothing item"}
-        </Text>
-      </Pressable>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -240,5 +271,31 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "700",
     fontSize: 16,
+  },
+
+  optionsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+
+  optionButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    backgroundColor: "#F1EDE8",
+  },
+
+  optionButtonActive: {
+    backgroundColor: "#2F2A26",
+  },
+
+  optionText: {
+    color: "#2F2A26",
+    fontWeight: "500",
+  },
+
+  optionTextActive: {
+    color: "#FFFFFF",
   },
 });

@@ -19,9 +19,11 @@ type ClothingItem = {
   image_url: string;
   category: string | null;
   last_worn: string | null;
+  season: string | null;
 };
 
 const categories = ["Top", "Bottom", "Dress", "Jacket", "Shoes", "Accessory"];
+const seasons = ["Lente", "Zomer", "Herfst", "Winter", "Alle seizoenen"];
 
 export default function ClosetScreen() {
   const router = useRouter();
@@ -32,6 +34,7 @@ export default function ClosetScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedSeasons, setSelectedSeasons] = useState<string[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -45,12 +48,6 @@ export default function ClosetScreen() {
     }, [category]),
   );
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     loadClothes();
-  //   }, []),
-  // );
-
   async function loadClothes() {
     try {
       setLoading(true);
@@ -63,7 +60,7 @@ export default function ClosetScreen() {
 
       const { data: clothesData, error: clothesError } = await supabase
         .from("clothes")
-        .select("id, name, image_url, category")
+        .select("id, name, image_url, category, season")
         .eq("user_id", user.id);
 
       if (clothesError) throw clothesError;
@@ -102,6 +99,19 @@ export default function ClosetScreen() {
     );
   }
 
+  function toggleSeason(season: string) {
+    setSelectedSeasons((prev) =>
+      prev.includes(season)
+        ? prev.filter((item) => item !== season)
+        : [...prev, season],
+    );
+  }
+
+  function clearFilters() {
+    setSelectedCategories([]);
+    setSelectedSeasons([]);
+  }
+
   const filteredClothes = clothes.filter((item) => {
     const matchesSearch =
       searchQuery.trim().length === 0 ||
@@ -111,7 +121,11 @@ export default function ClosetScreen() {
       selectedCategories.length === 0 ||
       selectedCategories.includes(item.category || "");
 
-    return matchesSearch && matchesCategory;
+    const matchesSeason =
+      selectedSeasons.length === 0 ||
+      selectedSeasons.includes(item.season || "");
+
+    return matchesSearch && matchesCategory && matchesSeason;
   });
 
   function formatDate(dateString: string | null) {
@@ -299,9 +313,33 @@ export default function ClosetScreen() {
             ))}
           </View>
 
+          <View style={styles.filterSection}>
+            <Text style={styles.filterSectionTitle}>Seizoen</Text>
+
+            {seasons.map((season) => (
+              <TouchableOpacity
+                key={season}
+                style={styles.checkboxRow}
+                onPress={() => toggleSeason(season)}
+              >
+                <Ionicons
+                  name={
+                    selectedSeasons.includes(season)
+                      ? "checkbox"
+                      : "square-outline"
+                  }
+                  size={22}
+                  color="#3F6473"
+                />
+
+                <Text style={styles.checkboxLabel}>{season}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
           <TouchableOpacity
             style={styles.clearFiltersButton}
-            onPress={() => setSelectedCategories([])}
+            onPress={clearFilters}
           >
             <Text style={styles.clearFiltersText}>Filters wissen</Text>
           </TouchableOpacity>
@@ -424,6 +462,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 12,
     padding: 12,
+    marginBottom: 12,
   },
   filterSectionTitle: {
     fontSize: 16,
@@ -442,7 +481,7 @@ const styles = StyleSheet.create({
     color: "#2F2F2F",
   },
   clearFiltersButton: {
-    marginTop: 14,
+    marginTop: 2,
     paddingVertical: 10,
     borderRadius: 10,
     backgroundColor: "#D8CEC3",

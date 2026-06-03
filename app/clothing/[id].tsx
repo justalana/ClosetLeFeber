@@ -18,6 +18,7 @@ type ClothingItem = {
   name: string | null;
   image_url: string;
   last_worn: string | null;
+  season: string | null;
 };
 
 type MonthlyWear = {
@@ -64,7 +65,7 @@ export default function ClothingDetailScreen() {
 
       const { data: clothingData, error: clothingError } = await supabase
         .from("clothes")
-        .select("id, name, image_url")
+        .select("id, name, image_url, season")
         .eq("id", id)
         .eq("user_id", user.id)
         .single();
@@ -243,6 +244,13 @@ export default function ClothingDetailScreen() {
       <View style={styles.statCard}>
         <Text style={styles.statLabel}>Laatst gedragen</Text>
         <Text style={styles.statValue}>{formatDate(item.last_worn)}</Text>
+      </View>
+
+      <View style={styles.statCard}>
+        <Text style={styles.statLabel}>Seizoen</Text>
+        <Text style={styles.statValue}>
+          {item.season || "Geen seizoen ingesteld"}
+        </Text>
       </View>
 
       <WearChart data={monthlyWear} />
