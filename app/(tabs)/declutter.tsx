@@ -133,7 +133,8 @@ export default function DeclutterScreen() {
         const bScore = bDays - bTimes * 20;
 
         return bScore - aScore;
-      });
+      })
+      .slice(0, 10);
   }, [clothes, selectedSeason]);
 
   const currentItem = declutterItems[currentIndex];
