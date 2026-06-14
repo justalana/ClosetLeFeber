@@ -60,6 +60,16 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="declutter"
+        options={{
+          title: "Declutter",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="trash-outline" size={size} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name="index"
         options={{
           title: "Home",
