@@ -193,6 +193,9 @@ export default function HomeScreen() {
             label="Favoriet"
             emoji="⭐"
             getImageUrl={getImageUrl}
+            onPress={() =>
+              mostWornItem && router.push(`/clothing/${mostWornItem.id}` as any)
+            }
           />
 
           <MentionCard
@@ -200,6 +203,10 @@ export default function HomeScreen() {
             label="Minst gedragen"
             emoji="☹️"
             getImageUrl={getImageUrl}
+            onPress={() =>
+              leastWornItem &&
+              router.push(`/clothing/${leastWornItem.id}` as any)
+            }
           />
         </View>
       </View>
@@ -212,11 +219,23 @@ type MentionCardProps = {
   label: string;
   emoji: string;
   getImageUrl: (url: string) => string;
+  onPress: () => void;
 };
 
-function MentionCard({ item, label, emoji, getImageUrl }: MentionCardProps) {
+function MentionCard({
+  item,
+  label,
+  emoji,
+  getImageUrl,
+  onPress,
+}: MentionCardProps) {
   return (
-    <View style={styles.mentionCard}>
+    <TouchableOpacity
+      style={styles.mentionCard}
+      onPress={onPress}
+      disabled={!item}
+      activeOpacity={0.8}
+    >
       <Text style={styles.mentionEmoji}>{emoji}</Text>
 
       {item ? (
@@ -232,7 +251,7 @@ function MentionCard({ item, label, emoji, getImageUrl }: MentionCardProps) {
       <Text style={styles.mentionName} numberOfLines={1}>
         {item?.name}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
