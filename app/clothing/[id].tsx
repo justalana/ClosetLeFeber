@@ -41,6 +41,42 @@ const MONTHS = [
   "Dec",
 ];
 
+function getWeatherLabel(value: string | null) {
+  if (!value) return "Geen weersoort ingesteld";
+
+  const normalized = value.toLowerCase();
+
+  if (
+    normalized.includes("warm") ||
+    normalized.includes("zomer") ||
+    normalized.includes("summer") ||
+    normalized.includes("lente") ||
+    normalized.includes("spring")
+  ) {
+    return "Warm weer";
+  }
+
+  if (
+    normalized.includes("koud") ||
+    normalized.includes("winter") ||
+    normalized.includes("herfst") ||
+    normalized.includes("autumn") ||
+    normalized.includes("cold")
+  ) {
+    return "Koud weer";
+  }
+
+  if (
+    normalized.includes("hele") ||
+    normalized.includes("all") ||
+    normalized.includes("alle")
+  ) {
+    return "Hele jaar";
+  }
+
+  return value;
+}
+
 export default function ClothingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -259,10 +295,8 @@ export default function ClothingDetailScreen() {
       </View>
 
       <View style={styles.statCard}>
-        <Text style={styles.statLabel}>Seizoen</Text>
-        <Text style={styles.statValue}>
-          {item.season || "Geen seizoen ingesteld"}
-        </Text>
+        <Text style={styles.statLabel}>Geschikt voor</Text>
+        <Text style={styles.statValue}>{getWeatherLabel(item.season)}</Text>
       </View>
 
       <WearChart data={monthlyWear} />

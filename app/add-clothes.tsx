@@ -31,7 +31,9 @@ export default function AddClothesScreen() {
   const [category, setCategory] = useState("Top");
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [loading, setLoading] = useState(false);
-  const [season, setSeason] = useState("Alle seizoenen");
+  const weatherOptions = ["Warm weer", "Koud weer", "Hele jaar"];
+
+  const [season, setSeason] = useState("Hele jaar");
 
   async function pickImage() {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -149,30 +151,28 @@ export default function AddClothesScreen() {
           ))}
         </View>
 
-        <Text style={styles.label}>Season</Text>
+        <Text style={styles.label}>Geschikt voor</Text>
 
         <View style={styles.optionsRow}>
-          {["Lente", "Zomer", "Herfst", "Winter", "Alle seizoenen"].map(
-            (item) => (
-              <Pressable
-                key={item}
+          {weatherOptions.map((item) => (
+            <Pressable
+              key={item}
+              style={[
+                styles.optionButton,
+                season === item && styles.optionButtonActive,
+              ]}
+              onPress={() => setSeason(item)}
+            >
+              <Text
                 style={[
-                  styles.optionButton,
-                  season === item && styles.optionButtonActive,
+                  styles.optionText,
+                  season === item && styles.optionTextActive,
                 ]}
-                onPress={() => setSeason(item)}
               >
-                <Text
-                  style={[
-                    styles.optionText,
-                    season === item && styles.optionTextActive,
-                  ]}
-                >
-                  {item}
-                </Text>
-              </Pressable>
-            ),
-          )}
+                {item}
+              </Text>
+            </Pressable>
+          ))}
         </View>
 
         <Text style={styles.label}>Image</Text>

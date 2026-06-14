@@ -23,7 +23,42 @@ type ClothingItem = {
 };
 
 const categories = ["Top", "Bottom", "Dress", "Jacket", "Shoes", "Accessory"];
-const seasons = ["Lente", "Zomer", "Herfst", "Winter", "Alle seizoenen"];
+const weatherOptions = ["Warm weer", "Koud weer", "Hele jaar"];
+
+function normalizeWeatherTag(value: string | null) {
+  if (!value) return "Hele jaar";
+
+  const normalized = value.toLowerCase();
+
+  if (
+    normalized.includes("warm") ||
+    normalized.includes("zomer") ||
+    normalized.includes("summer") ||
+    normalized.includes("lente") ||
+    normalized.includes("spring")
+  ) {
+    return "Warm weer";
+  }
+
+  if (
+    normalized.includes("koud") ||
+    normalized.includes("winter") ||
+    normalized.includes("herfst") ||
+    normalized.includes("autumn")
+  ) {
+    return "Koud weer";
+  }
+
+  if (
+    normalized.includes("hele") ||
+    normalized.includes("all") ||
+    normalized.includes("alle")
+  ) {
+    return "Hele jaar";
+  }
+
+  return value;
+}
 
 export default function ClosetScreen() {
   const router = useRouter();
@@ -123,7 +158,7 @@ export default function ClosetScreen() {
 
     const matchesSeason =
       selectedSeasons.length === 0 ||
-      selectedSeasons.includes(item.season || "");
+      selectedSeasons.includes(normalizeWeatherTag(item.season));
 
     return matchesSearch && matchesCategory && matchesSeason;
   });
@@ -314,9 +349,9 @@ export default function ClosetScreen() {
           </View>
 
           <View style={styles.filterSection}>
-            <Text style={styles.filterSectionTitle}>Seizoen</Text>
+            <Text style={styles.filterSectionTitle}>Geschikt voor</Text>
 
-            {seasons.map((season) => (
+            {weatherOptions.map((season) => (
               <TouchableOpacity
                 key={season}
                 style={styles.checkboxRow}

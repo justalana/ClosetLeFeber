@@ -28,24 +28,44 @@ type SelectedItem = ClothingItem & {
   choice: DeclutterChoice;
 };
 
-const seasons = [
+const weatherOptions = [
   { label: "Alles", value: "all", icon: "shirt-outline" },
-  { label: "Lente", value: "spring", icon: "flower-outline" },
-  { label: "Zomer", value: "summer", icon: "sunny-outline" },
-  { label: "Herfst", value: "autumn", icon: "leaf-outline" },
-  { label: "Winter", value: "winter", icon: "snow-outline" },
+  { label: "Warm weer", value: "warm", icon: "sunny-outline" },
+  { label: "Koud weer", value: "cold", icon: "snow-outline" },
+  { label: "Hele jaar", value: "allYear", icon: "partly-sunny-outline" },
 ];
 
-function normalizeSeason(season: string | null) {
-  if (!season) return "all";
+function normalizeWeatherTag(season: string | null) {
+  if (!season) return "allYear";
 
   const value = season.toLowerCase();
 
-  if (value.includes("zomer") || value.includes("summer")) return "summer";
-  if (value.includes("winter")) return "winter";
-  if (value.includes("herfst") || value.includes("autumn")) return "autumn";
-  if (value.includes("lente") || value.includes("spring")) return "spring";
-  if (value.includes("all") || value.includes("alle")) return "all";
+  if (
+    value.includes("warm") ||
+    value.includes("zomer") ||
+    value.includes("summer") ||
+    value.includes("lente") ||
+    value.includes("spring")
+  ) {
+    return "warm";
+  }
+
+  if (
+    value.includes("koud") ||
+    value.includes("winter") ||
+    value.includes("herfst") ||
+    value.includes("autumn")
+  ) {
+    return "cold";
+  }
+
+  if (
+    value.includes("hele") ||
+    value.includes("all") ||
+    value.includes("alle")
+  ) {
+    return "allYear";
+  }
 
   return value;
 }
@@ -75,7 +95,7 @@ export default function DeclutterScreen() {
   const [clothes, setClothes] = useState<ClothingItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [selectedSeason, setSelectedSeason] = useState<string | null>(null);
+  const [selectedWeather, setSelectedWeather] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedItems, setSelectedItems] = useState<SelectedItem[]>([]);
   const [finished, setFinished] = useState(false);
@@ -112,15 +132,15 @@ export default function DeclutterScreen() {
   }
 
   const declutterItems = useMemo(() => {
-    if (!selectedSeason) return [];
+    if (!selectedWeather) return [];
 
     return clothes
       .filter((item) => {
-        const itemSeason = normalizeSeason(item.season);
+        const itemWeather = normalizeWeatherTag(item.season);
 
-        if (selectedSeason === "all") return true;
+        if (selectedWeather === "all") return true;
 
-        return itemSeason === selectedSeason;
+        return itemWeather === selectedWeather;
       })
       .sort((a, b) => {
         const aTimes = a.times_worn ?? 0;
@@ -135,7 +155,7 @@ export default function DeclutterScreen() {
         return bScore - aScore;
       })
       .slice(0, 10);
-  }, [clothes, selectedSeason]);
+  }, [clothes, selectedWeather]);
 
   const currentItem = declutterItems[currentIndex];
 
@@ -152,14 +172,14 @@ export default function DeclutterScreen() {
   }
 
   function resetDeclutterSession() {
-    setSelectedSeason(null);
+    setSelectedWeather(null);
     setCurrentIndex(0);
     setSelectedItems([]);
     setFinished(false);
   }
 
-  function startSeason(season: string) {
-    setSelectedSeason(season);
+  function startWeatherSession(weather: string) {
+    setSelectedWeather(weather);
     setCurrentIndex(0);
     setSelectedItems([]);
     setFinished(false);
@@ -177,28 +197,28 @@ export default function DeclutterScreen() {
     );
   }
 
-  if (!selectedSeason) {
+  if (!selectedWeather) {
     return (
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
       >
         <Text style={styles.smallTitle}>Declutter Mode</Text>
-        <Text style={styles.title}>Welke kast wil je opruimen?</Text>
+        <Text style={styles.title}>Welke kleding wil je opruimen?</Text>
         <Text style={styles.description}>
-          Kies een seizoen. De app toont daarna vooral kleding die je weinig of
-          lang niet hebt gedragen.
+          Kies een weersoort. De app toont daarna vooral kleding die je weinig
+          of lang niet hebt gedragen.
         </Text>
 
         <View style={styles.seasonGrid}>
-          {seasons.map((season) => (
+          {weatherOptions.map((weather) => (
             <TouchableOpacity
-              key={season.value}
+              key={weather.value}
               style={styles.seasonCard}
-              onPress={() => startSeason(season.value)}
+              onPress={() => startWeatherSession(weather.value)}
             >
-              <Ionicons name={season.icon as any} size={28} color="#46342c" />
-              <Text style={styles.seasonText}>{season.label}</Text>
+              <Ionicons name={weather.icon as any} size={28} color="#46342c" />
+              <Text style={styles.seasonText}>{weather.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -291,8 +311,8 @@ export default function DeclutterScreen() {
                 value={currentItem.category || "Onbekend"}
               />
               <InfoRow
-                label="Seizoen"
-                value={currentItem.season || "Alle seizoenen"}
+                label="Geschikt voor"
+                value={currentItem.season || "Hele jaar"}
               />
             </View>
           </View>
