@@ -58,10 +58,11 @@ function getWeatherLabel(value: string | null) {
 
   if (
     normalized.includes("koud") ||
+    normalized.includes("cold") ||
     normalized.includes("winter") ||
     normalized.includes("herfst") ||
     normalized.includes("autumn") ||
-    normalized.includes("cold")
+    normalized.includes("fall")
   ) {
     return "Koud weer";
   }

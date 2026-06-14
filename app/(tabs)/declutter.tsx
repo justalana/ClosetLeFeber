@@ -29,16 +29,16 @@ type SelectedItem = ClothingItem & {
 };
 
 const weatherOptions = [
-  { label: "Alles", value: "all", icon: "shirt-outline" },
-  { label: "Warm weer", value: "warm", icon: "sunny-outline" },
-  { label: "Koud weer", value: "cold", icon: "snow-outline" },
-  { label: "Hele jaar", value: "allYear", icon: "partly-sunny-outline" },
+  { label: "Alles", value: "Alles", icon: "shirt-outline" },
+  { label: "Warm weer", value: "Warm weer", icon: "sunny-outline" },
+  { label: "Koud weer", value: "Koud weer", icon: "snow-outline" },
+  { label: "Hele jaar", value: "Hele jaar", icon: "partly-sunny-outline" },
 ];
 
 function normalizeWeatherTag(season: string | null) {
-  if (!season) return "allYear";
+  if (!season) return "Hele jaar";
 
-  const value = season.toLowerCase();
+  const value = season.toLowerCase().trim();
 
   if (
     value.includes("warm") ||
@@ -47,16 +47,18 @@ function normalizeWeatherTag(season: string | null) {
     value.includes("lente") ||
     value.includes("spring")
   ) {
-    return "warm";
+    return "Warm weer";
   }
 
   if (
     value.includes("koud") ||
+    value.includes("cold") ||
     value.includes("winter") ||
     value.includes("herfst") ||
-    value.includes("autumn")
+    value.includes("autumn") ||
+    value.includes("fall")
   ) {
-    return "cold";
+    return "Koud weer";
   }
 
   if (
@@ -64,10 +66,14 @@ function normalizeWeatherTag(season: string | null) {
     value.includes("all") ||
     value.includes("alle")
   ) {
-    return "allYear";
+    return "Hele jaar";
   }
 
-  return value;
+  return season;
+}
+
+function getWeatherLabel(value: string | null) {
+  return normalizeWeatherTag(value);
 }
 
 function getDaysSince(dateString: string | null) {
@@ -125,7 +131,7 @@ export default function DeclutterScreen() {
 
       setClothes(data || []);
     } catch (error) {
-      console.log("Could not load clothes:", error);
+      console.log("Kon kleding niet laden:", error);
     } finally {
       setLoading(false);
     }
@@ -138,7 +144,7 @@ export default function DeclutterScreen() {
       .filter((item) => {
         const itemWeather = normalizeWeatherTag(item.season);
 
-        if (selectedWeather === "all") return true;
+        if (selectedWeather === "Alles") return true;
 
         return itemWeather === selectedWeather;
       })
@@ -312,7 +318,7 @@ export default function DeclutterScreen() {
               />
               <InfoRow
                 label="Geschikt voor"
-                value={currentItem.season || "Hele jaar"}
+                value={getWeatherLabel(currentItem.season)}
               />
             </View>
           </View>

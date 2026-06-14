@@ -15,13 +15,13 @@ import {
 } from "react-native";
 
 const categories = [
-  "Top",
-  "Bottom",
-  "Dress",
-  "Jacket",
-  "Shoes",
-  "Accessory",
-  "Other",
+  { label: "Top", value: "Top" },
+  { label: "Broek/rok", value: "Bottom" },
+  { label: "Jurk", value: "Dress" },
+  { label: "Jas", value: "Jacket" },
+  { label: "Schoenen", value: "Shoes" },
+  { label: "Accessoire", value: "Accessory" },
+  { label: "Anders", value: "Other" },
 ];
 
 export default function AddClothesScreen() {
@@ -59,7 +59,7 @@ export default function AddClothesScreen() {
       } = await supabase.auth.getUser();
 
       if (userError || !user) {
-        Alert.alert("Error", "You need to be logged in.");
+        Alert.alert("Fout", "Je moet ingelogd zijn.");
         return;
       }
 
@@ -106,10 +106,10 @@ export default function AddClothesScreen() {
         throw error;
       }
 
-      Alert.alert("Saved", "Clothing item added!");
+      Alert.alert("Opgeslagen", "Kledingstuk toegevoegd!");
       router.push("/closet");
     } catch (error: any) {
-      Alert.alert("Error", error.message);
+      Alert.alert("Fout", error.message);
     } finally {
       setLoading(false);
     }
@@ -118,34 +118,34 @@ export default function AddClothesScreen() {
   return (
     <ScrollView>
       <View style={styles.container}>
-        <Text style={styles.title}>Add clothing item</Text>
+        <Text style={styles.title}>Kledingstuk toevoegen</Text>
 
-        <Text style={styles.label}>Name optional</Text>
+        <Text style={styles.label}>Naam optioneel</Text>
         <TextInput
           style={styles.input}
-          placeholder="Black hoodie"
+          placeholder="Zwarte hoodie"
           value={name}
           onChangeText={setName}
         />
 
-        <Text style={styles.label}>Category</Text>
+        <Text style={styles.label}>Soort</Text>
         <View style={styles.categoryGrid}>
           {categories.map((item) => (
             <Pressable
-              key={item}
+              key={item.value}
               style={[
                 styles.categoryButton,
-                category === item && styles.categoryButtonActive,
+                category === item.value && styles.categoryButtonActive,
               ]}
-              onPress={() => setCategory(item)}
+              onPress={() => setCategory(item.value)}
             >
               <Text
                 style={[
                   styles.categoryText,
-                  category === item && styles.categoryTextActive,
+                  category === item.value && styles.categoryTextActive,
                 ]}
               >
-                {item}
+                {item.label}
               </Text>
             </Pressable>
           ))}
@@ -175,10 +175,10 @@ export default function AddClothesScreen() {
           ))}
         </View>
 
-        <Text style={styles.label}>Image</Text>
+        <Text style={styles.label}>Afbeelding</Text>
         <Pressable style={styles.imageButton} onPress={pickImage}>
           <Text style={styles.imageButtonText}>
-            {image ? "Change image" : "Choose image"}
+            {image ? "Afbeelding wijzigen" : "Afbeelding kiezen"}
           </Text>
         </Pressable>
 
@@ -190,7 +190,7 @@ export default function AddClothesScreen() {
           disabled={loading}
         >
           <Text style={styles.saveButtonText}>
-            {loading ? "Saving..." : "Save clothing item"}
+            {loading ? "Opslaan..." : "Kledingstuk opslaan"}
           </Text>
         </Pressable>
       </View>

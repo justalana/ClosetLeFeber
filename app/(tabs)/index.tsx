@@ -20,11 +20,24 @@ type ClothingItem = {
 };
 
 const categories = [
-  { label: "Top", image: require("../../assets/images/tshirt.png") },
-  { label: "Bottom", image: require("../../assets/images/jeans.png") },
-  { label: "Dress", image: require("../../assets/images/dress.png") },
   {
-    label: "Accessories",
+    label: "Top",
+    value: "Top",
+    image: require("../../assets/images/tshirt.png"),
+  },
+  {
+    label: "Broek/rok",
+    value: "Bottom",
+    image: require("../../assets/images/jeans.png"),
+  },
+  {
+    label: "Jurk",
+    value: "Dress",
+    image: require("../../assets/images/dress.png"),
+  },
+  {
+    label: "Accessoires",
+    value: "Accessory",
     image: require("../../assets/images/wristwatch.png"),
   },
 ];
@@ -150,15 +163,16 @@ export default function HomeScreen() {
           <Text style={styles.sectionTitle}>Categorieën</Text>
 
           <TouchableOpacity onPress={() => router.push("/closet" as any)}>
-            <Text style={styles.seeAll}>See all</Text>
+            <Text style={styles.seeAll}>Alles zien</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.categoriesRow}>
           {categories.map((category) => (
             <TouchableOpacity
-              key={category.label}
+              key={category.value}
               style={styles.categoryButton}
+              onPress={() => goToCategory(category.value)}
             >
               <Image
                 source={category.image}

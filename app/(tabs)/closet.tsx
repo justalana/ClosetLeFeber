@@ -22,7 +22,14 @@ type ClothingItem = {
   season: string | null;
 };
 
-const categories = ["Top", "Bottom", "Dress", "Jacket", "Shoes", "Accessory"];
+const categories = [
+  { label: "Top", value: "Top" },
+  { label: "Broek/rok", value: "Bottom" },
+  { label: "Jurk", value: "Dress" },
+  { label: "Jas", value: "Jacket" },
+  { label: "Schoenen", value: "Shoes" },
+  { label: "Accessoire", value: "Accessory" },
+];
 const weatherOptions = ["Warm weer", "Koud weer", "Hele jaar"];
 
 function normalizeWeatherTag(value: string | null) {
@@ -42,9 +49,11 @@ function normalizeWeatherTag(value: string | null) {
 
   if (
     normalized.includes("koud") ||
+    normalized.includes("cold") ||
     normalized.includes("winter") ||
     normalized.includes("herfst") ||
-    normalized.includes("autumn")
+    normalized.includes("autumn") ||
+    normalized.includes("fall")
   ) {
     return "Koud weer";
   }
@@ -291,7 +300,7 @@ export default function ClosetScreen() {
             />
 
             <Text style={styles.name} numberOfLines={1}>
-              {item.name || "Unnamed"}
+              {item.name || "Naamloos"}
             </Text>
 
             <Text style={styles.date}>
@@ -305,7 +314,7 @@ export default function ClosetScreen() {
                 logClothingWear(item.id);
               }}
             >
-              <Text style={styles.logButtonText}>Log</Text>
+              <Text style={styles.logButtonText}>Loggen</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         )}
@@ -329,13 +338,13 @@ export default function ClosetScreen() {
 
             {categories.map((category) => (
               <TouchableOpacity
-                key={category}
+                key={category.value}
                 style={styles.checkboxRow}
-                onPress={() => toggleCategory(category)}
+                onPress={() => toggleCategory(category.value)}
               >
                 <Ionicons
                   name={
-                    selectedCategories.includes(category)
+                    selectedCategories.includes(category.value)
                       ? "checkbox"
                       : "square-outline"
                   }
@@ -343,7 +352,7 @@ export default function ClosetScreen() {
                   color="#3F6473"
                 />
 
-                <Text style={styles.checkboxLabel}>{category}</Text>
+                <Text style={styles.checkboxLabel}>{category.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
