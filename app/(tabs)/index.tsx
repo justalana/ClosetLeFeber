@@ -216,7 +216,7 @@ function MentionCard({ item, label, emoji, getImageUrl }: MentionCardProps) {
 
       <Text style={styles.mentionLabel}>{label}</Text>
       <Text style={styles.mentionName} numberOfLines={1}>
-        {item?.name || "Nog geen item"}
+        {item?.name}
       </Text>
     </View>
   );
