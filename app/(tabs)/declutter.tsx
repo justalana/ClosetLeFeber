@@ -35,45 +35,8 @@ const weatherOptions = [
   { label: "Hele jaar", value: "Hele jaar", icon: "partly-sunny-outline" },
 ];
 
-function normalizeWeatherTag(season: string | null) {
-  if (!season) return "Hele jaar";
-
-  const value = season.toLowerCase().trim();
-
-  if (
-    value.includes("warm") ||
-    value.includes("zomer") ||
-    value.includes("summer") ||
-    value.includes("lente") ||
-    value.includes("spring")
-  ) {
-    return "Warm weer";
-  }
-
-  if (
-    value.includes("koud") ||
-    value.includes("cold") ||
-    value.includes("winter") ||
-    value.includes("herfst") ||
-    value.includes("autumn") ||
-    value.includes("fall")
-  ) {
-    return "Koud weer";
-  }
-
-  if (
-    value.includes("hele") ||
-    value.includes("all") ||
-    value.includes("alle")
-  ) {
-    return "Hele jaar";
-  }
-
-  return season;
-}
-
 function getWeatherLabel(value: string | null) {
-  return normalizeWeatherTag(value);
+  return value || "Hele jaar";
 }
 
 function getDaysSince(dateString: string | null) {
@@ -142,7 +105,7 @@ export default function DeclutterScreen() {
 
     return clothes
       .filter((item) => {
-        const itemWeather = normalizeWeatherTag(item.season);
+        const itemWeather = item.season;
 
         if (selectedWeather === "Alles") return true;
 

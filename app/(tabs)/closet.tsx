@@ -32,43 +32,6 @@ const categories = [
 ];
 const weatherOptions = ["Warm weer", "Koud weer", "Hele jaar"];
 
-function normalizeWeatherTag(value: string | null) {
-  if (!value) return "Hele jaar";
-
-  const normalized = value.toLowerCase();
-
-  if (
-    normalized.includes("warm") ||
-    normalized.includes("zomer") ||
-    normalized.includes("summer") ||
-    normalized.includes("lente") ||
-    normalized.includes("spring")
-  ) {
-    return "Warm weer";
-  }
-
-  if (
-    normalized.includes("koud") ||
-    normalized.includes("cold") ||
-    normalized.includes("winter") ||
-    normalized.includes("herfst") ||
-    normalized.includes("autumn") ||
-    normalized.includes("fall")
-  ) {
-    return "Koud weer";
-  }
-
-  if (
-    normalized.includes("hele") ||
-    normalized.includes("all") ||
-    normalized.includes("alle")
-  ) {
-    return "Hele jaar";
-  }
-
-  return value;
-}
-
 export default function ClosetScreen() {
   const router = useRouter();
   const { category } = useLocalSearchParams<{ category?: string }>();
@@ -167,7 +130,7 @@ export default function ClosetScreen() {
 
     const matchesSeason =
       selectedSeasons.length === 0 ||
-      selectedSeasons.includes(normalizeWeatherTag(item.season));
+      selectedSeasons.includes(item.season || "");
 
     return matchesSearch && matchesCategory && matchesSeason;
   });
