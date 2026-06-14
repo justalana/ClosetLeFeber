@@ -20,6 +20,7 @@ type ClothingItem = {
   last_worn: string | null;
   season: string | null;
   times_worn: number | null;
+  marked_for_declutter: boolean | null;
 };
 
 type DeclutterChoice = "keep" | "maybe" | "remove";
@@ -87,7 +88,9 @@ export default function DeclutterScreen() {
 
       const { data, error } = await supabase
         .from("clothes")
-        .select("id, name, image_url, category, last_worn, season, times_worn")
+        .select(
+          "id, name, image_url, category, last_worn, season, times_worn, marked_for_declutter",
+        )
         .eq("user_id", user.id);
 
       if (error) throw error;
@@ -128,10 +131,31 @@ export default function DeclutterScreen() {
 
   const currentItem = declutterItems[currentIndex];
 
-  function handleChoice(choice: DeclutterChoice) {
+  async function handleChoice(choice: DeclutterChoice) {
     if (!currentItem) return;
 
-    setSelectedItems((prev) => [...prev, { ...currentItem, choice }]);
+    if (choice === "remove") {
+      const { error } = await supabase
+        .from("clothes")
+        .update({ marked_for_declutter: true })
+        .eq("id", currentItem.id);
+
+      if (error) {
+        console.log("Kon item niet markeren:", error);
+        alert("Kon kledingstuk niet in de decluttermand zetten.");
+        return;
+      }
+    }
+
+    setSelectedItems((prev) => [
+      ...prev,
+      {
+        ...currentItem,
+        marked_for_declutter:
+          choice === "remove" ? true : currentItem.marked_for_declutter,
+        choice,
+      },
+    ]);
 
     if (currentIndex + 1 >= declutterItems.length) {
       setFinished(true);
@@ -229,8 +253,9 @@ export default function DeclutterScreen() {
           <View style={styles.adviceBox}>
             <Text style={styles.adviceTitle}>Volgende stap</Text>
             <Text style={styles.adviceText}>
-              Leg deze kleding apart in een tas. Als je ze over 2 weken nog niet
-              mist, breng ze naar een kringloop of goed doel.
+              Deze kledingstukken staan nu in je decluttermand. Je hoeft ze nog
+              niet meteen te verwijderen: verzamel ze eerst in een tas en rond
+              ze later af vanuit de mand.
             </Text>
           </View>
         )}

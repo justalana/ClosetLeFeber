@@ -20,6 +20,7 @@ type ClothingItem = {
   category: string | null;
   last_worn: string | null;
   season: string | null;
+  marked_for_declutter: boolean | null;
 };
 
 const categories = [
@@ -67,7 +68,7 @@ export default function ClosetScreen() {
 
       const { data: clothesData, error: clothesError } = await supabase
         .from("clothes")
-        .select("id, name, image_url, category, season")
+        .select("id, name, image_url, category, season, marked_for_declutter")
         .eq("user_id", user.id);
 
       if (clothesError) throw clothesError;
@@ -254,7 +255,10 @@ export default function ClosetScreen() {
         }
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={styles.card}
+            style={[
+              styles.card,
+              item.marked_for_declutter && styles.declutterCard,
+            ]}
             onPress={() => router.push(`/clothing/${item.id}` as any)}
           >
             <Image
@@ -265,6 +269,13 @@ export default function ClosetScreen() {
             <Text style={styles.name} numberOfLines={1}>
               {item.name || "Naamloos"}
             </Text>
+
+            {item.marked_for_declutter && (
+              <View style={styles.declutterBadge}>
+                <Ionicons name="basket-outline" size={12} color="#8A2F24" />
+                <Text style={styles.declutterBadgeText}>Declutter</Text>
+              </View>
+            )}
 
             <Text style={styles.date}>
               Laatst gedragen: {formatDate(item.last_worn)}
@@ -413,6 +424,28 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 14,
     padding: 8,
+    borderWidth: 1,
+    borderColor: "transparent",
+  },
+  declutterCard: {
+    backgroundColor: "#FFF0EC",
+    borderColor: "#C45A4D",
+  },
+  declutterBadge: {
+    marginTop: 6,
+    alignSelf: "flex-start",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: "#FFD8D0",
+    borderRadius: 999,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+  },
+  declutterBadgeText: {
+    fontSize: 10,
+    fontWeight: "800",
+    color: "#8A2F24",
   },
   image: {
     width: "100%",

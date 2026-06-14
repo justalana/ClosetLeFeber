@@ -19,6 +19,7 @@ type ClothingItem = {
   image_url: string;
   last_worn: string | null;
   season: string | null;
+  marked_for_declutter: boolean;
 };
 
 type MonthlyWear = {
@@ -65,7 +66,7 @@ export default function ClothingDetailScreen() {
 
       const { data: clothingData, error: clothingError } = await supabase
         .from("clothes")
-        .select("id, name, image_url, season")
+        .select("id, name, image_url, season, marked_for_declutter")
         .eq("id", id)
         .eq("user_id", user.id)
         .single();
@@ -171,6 +172,24 @@ export default function ClothingDetailScreen() {
     );
   }
 
+  async function unmarkForDeclutter() {
+    if (!item) return;
+
+    const { error } = await supabase
+      .from("clothes")
+      .update({
+        marked_for_declutter: false,
+      })
+      .eq("id", item.id);
+
+    if (error) {
+      Alert.alert("Fout", "Kon status niet aanpassen.");
+      return;
+    }
+
+    loadItem();
+  }
+
   function formatDate(dateString: string | null) {
     if (!dateString) return "Nog nooit gedragen";
 
@@ -266,6 +285,25 @@ export default function ClothingDetailScreen() {
       </View>
 
       <WearChart data={monthlyWear} />
+
+      {item.marked_for_declutter && (
+        <View style={styles.declutterCard}>
+          <Text style={styles.declutterTitle}>
+            🧺 Gemarkeerd voor decluttering
+          </Text>
+
+          <Text style={styles.declutterText}>
+            Dit kledingstuk staat in je decluttermand.
+          </Text>
+
+          <TouchableOpacity
+            style={styles.restoreButton}
+            onPress={unmarkForDeclutter}
+          >
+            <Text style={styles.restoreButtonText}>Toch houden</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.logButton} onPress={logClothingWear}>
@@ -438,5 +476,37 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3EFE8",
     justifyContent: "center",
     alignItems: "center",
+  },
+  declutterCard: {
+    marginTop: 18,
+    padding: 16,
+    borderRadius: 18,
+    backgroundColor: "#fff3e8",
+    borderWidth: 1,
+    borderColor: "#ffb86b",
+  },
+
+  declutterTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#9a4f00",
+  },
+
+  declutterText: {
+    marginTop: 8,
+    color: "#7a5a40",
+  },
+
+  restoreButton: {
+    marginTop: 14,
+    backgroundColor: "#2f2f2f",
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+
+  restoreButtonText: {
+    color: "#fff",
+    fontWeight: "700",
   },
 });

@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs, router } from "expo-router";
-import { Image, Platform, TouchableOpacity } from "react-native";
+import { Image, Platform, TouchableOpacity, View } from "react-native";
 
 export default function TabLayout() {
   return (
@@ -20,12 +20,28 @@ export default function TabLayout() {
         },
 
         headerRight: () => (
-          <TouchableOpacity
-            onPress={() => router.push("/profile")}
-            style={{ marginRight: 18 }}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 14,
+              marginRight: 18,
+            }}
           >
-            <Ionicons name="person-circle-outline" size={30} color="#2E2925" />
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/declutter-basket" as any)}
+            >
+              <Ionicons name="basket-outline" size={28} color="#2E2925" />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => router.push("/profile")}>
+              <Ionicons
+                name="person-circle-outline"
+                size={30}
+                color="#2E2925"
+              />
+            </TouchableOpacity>
+          </View>
         ),
 
         tabBarActiveTintColor: "#2E2925",
@@ -94,6 +110,14 @@ export default function TabLayout() {
               resizeMode="contain"
             />
           ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="declutter-basket"
+        options={{
+          title: "Decluttermand",
+          href: null,
         }}
       />
     </Tabs>
