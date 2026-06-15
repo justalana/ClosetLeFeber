@@ -1,7 +1,12 @@
+import LoadingScreen from "@/components/LoadingScreen";
+import ClothingRackCarousel from "@/components/ClothingRackCarousel";
+import { Colors } from "@/constants/colors";
+import { logClothingWear } from "@/lib/log-clothing-wear";
+import { supabase } from "@/lib/supabase";
+import { CarouselClothingItem } from "@/types/clothing";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -9,10 +14,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import ClothingRackCarousel, {
-  CarouselClothingItem,
-} from "../../components/ClothingRackCarousel";
-import { supabase } from "../../lib/supabase";
 
 export default function OutfitScreen() {
   const [tops, setTops] = useState<CarouselClothingItem[]>([]);
@@ -76,37 +77,6 @@ export default function OutfitScreen() {
     }
   }
 
-  async function logItem(item: CarouselClothingItem) {
-    const newTimesWorn = (item.times_worn ?? 0) + 1;
-    const wornAt = new Date().toISOString();
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) throw new Error("Geen gebruiker gevonden");
-
-    const { error: logError } = await supabase
-      .from("clothing_wear_logs")
-      .insert({
-        clothing_id: item.id,
-        user_id: user.id,
-        worn_at: wornAt,
-      });
-
-    if (logError) throw logError;
-
-    const { error: updateError } = await supabase
-      .from("clothes")
-      .update({
-        times_worn: newTimesWorn,
-        last_worn: wornAt,
-      })
-      .eq("id", item.id);
-
-    if (updateError) throw updateError;
-  }
-
   async function chooseOutfit() {
     if (!selectedTop || !selectedBottom) {
       Alert.alert("Nog niet compleet", "Kies eerst een top en een bottom.");
@@ -116,8 +86,11 @@ export default function OutfitScreen() {
     try {
       setLogging(true);
 
-      await logItem(selectedTop);
-      await logItem(selectedBottom);
+      const topResult = await logClothingWear(selectedTop.id);
+      if (topResult.error) throw new Error(topResult.error);
+
+      const bottomResult = await logClothingWear(selectedBottom.id);
+      if (bottomResult.error) throw new Error(bottomResult.error);
 
       Alert.alert(
         "Outfit gelogd",
@@ -135,9 +108,7 @@ export default function OutfitScreen() {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#A66A4C" />
-      </View>
+      <LoadingScreen color={Colors.primary} backgroundColor={Colors.background} />
     );
   }
 
@@ -190,21 +161,12 @@ export default function OutfitScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF9F2",
+    backgroundColor: Colors.background,
   },
-
   content: {
     paddingTop: 64,
     paddingBottom: 120,
   },
-
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FFF9F2",
-  },
-
   header: {
     paddingHorizontal: 24,
     marginBottom: 28,
@@ -212,13 +174,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-
   pageTitle: {
     fontSize: 30,
     fontWeight: "900",
     color: "#2F2A26",
   },
-
   subtitle: {
     marginTop: 6,
     fontSize: 15,
@@ -226,22 +186,12 @@ const styles = StyleSheet.create({
     width: 250,
     lineHeight: 21,
   },
-
-  iconCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: "#F2E3D4",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
   chooseButton: {
     marginHorizontal: 24,
     marginTop: 8,
     height: 58,
     borderRadius: 20,
-    backgroundColor: "#A66A4C",
+    backgroundColor: Colors.primary,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
@@ -250,17 +200,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     elevation: 4,
   },
-
   disabledButton: {
     opacity: 0.6,
   },
-
   chooseButtonText: {
-    color: "#FFF",
+    color: Colors.white,
     fontSize: 17,
     fontWeight: "900",
   },
-
   emptyBox: {
     marginHorizontal: 24,
     padding: 24,
@@ -269,14 +216,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#E2D3C4",
   },
-
   emptyTitle: {
     fontSize: 20,
     fontWeight: "900",
     color: "#2F2A26",
     marginBottom: 8,
   },
-
   emptyText: {
     fontSize: 15,
     lineHeight: 22,

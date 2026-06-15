@@ -1,7 +1,13 @@
+import LoadingScreen from "@/components/LoadingScreen";
+import MentionCard from "@/components/MentionCard";
+import { HOME_CATEGORIES } from "@/constants/categories";
+import { Colors } from "@/constants/colors";
+import { getClothingImageUrl } from "@/lib/clothing-images";
+import { supabase } from "@/lib/supabase";
+import { ClothingItem } from "@/types/clothing";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   ScrollView,
   StyleSheet,
@@ -9,38 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { supabase } from "../../lib/supabase";
-
-type ClothingItem = {
-  id: string;
-  name: string | null;
-  image_url: string;
-  category: string | null;
-  times_worn: number | null;
-};
-
-const categories = [
-  {
-    label: "Top",
-    value: "Top",
-    image: require("../../assets/images/tshirt.png"),
-  },
-  {
-    label: "Broek/rok",
-    value: "Bottom",
-    image: require("../../assets/images/jeans.png"),
-  },
-  {
-    label: "Jurk",
-    value: "Dress",
-    image: require("../../assets/images/dress.png"),
-  },
-  {
-    label: "Accessoires",
-    value: "Accessory",
-    image: require("../../assets/images/wristwatch.png"),
-  },
-];
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -103,13 +77,6 @@ export default function HomeScreen() {
     }
   }
 
-  function getImageUrl(imageUrl: string) {
-    if (imageUrl.startsWith("http")) return imageUrl;
-
-    return supabase.storage.from("clothing-images").getPublicUrl(imageUrl).data
-      .publicUrl;
-  }
-
   function goToCategory(category: string) {
     router.push({
       pathname: "/closet",
@@ -118,11 +85,7 @@ export default function HomeScreen() {
   }
 
   if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -143,7 +106,7 @@ export default function HomeScreen() {
               onPress={() => router.push(`/clothing/${item.id}` as any)}
             >
               <Image
-                source={{ uri: getImageUrl(item.image_url) }}
+                source={{ uri: getClothingImageUrl(item.image_url) }}
                 style={styles.clothingImage}
               />
             </TouchableOpacity>
@@ -168,14 +131,14 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.categoriesRow}>
-          {categories.map((category) => (
+          {HOME_CATEGORIES.map((category) => (
             <TouchableOpacity
               key={category.value}
               style={styles.categoryButton}
               onPress={() => goToCategory(category.value)}
             >
               <Image
-                source={category.image}
+                source={category.image!}
                 style={styles.categoryIcon}
                 resizeMode="contain"
               />
@@ -192,7 +155,6 @@ export default function HomeScreen() {
             item={mostWornItem}
             label="Favoriet"
             emoji="⭐"
-            getImageUrl={getImageUrl}
             onPress={() =>
               mostWornItem && router.push(`/clothing/${mostWornItem.id}` as any)
             }
@@ -202,7 +164,6 @@ export default function HomeScreen() {
             item={leastWornItem}
             label="Minst gedragen"
             emoji="☹️"
-            getImageUrl={getImageUrl}
             onPress={() =>
               leastWornItem &&
               router.push(`/clothing/${leastWornItem.id}` as any)
@@ -214,71 +175,13 @@ export default function HomeScreen() {
   );
 }
 
-type MentionCardProps = {
-  item: ClothingItem | null;
-  label: string;
-  emoji: string;
-  getImageUrl: (url: string) => string;
-  onPress: () => void;
-};
-
-function MentionCard({
-  item,
-  label,
-  emoji,
-  getImageUrl,
-  onPress,
-}: MentionCardProps) {
-  return (
-    <TouchableOpacity
-      style={styles.mentionCard}
-      onPress={onPress}
-      disabled={!item}
-      activeOpacity={0.8}
-    >
-      <Text style={styles.mentionEmoji}>{emoji}</Text>
-
-      {item ? (
-        <Image
-          source={{ uri: getImageUrl(item.image_url) }}
-          style={styles.mentionImage}
-        />
-      ) : (
-        <View style={styles.emptyMention} />
-      )}
-
-      <Text style={styles.mentionLabel}>{label}</Text>
-      <Text style={styles.mentionName} numberOfLines={1}>
-        {item?.name}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F4EF",
+    backgroundColor: Colors.background,
   },
   content: {
     paddingBottom: 110,
-  },
-  topBar: {
-    height: 68,
-    backgroundColor: "#D9D9D9",
-    paddingHorizontal: 22,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  profileCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 2,
-    borderColor: "#2F2F2F",
-    justifyContent: "center",
-    alignItems: "center",
   },
   header: {
     alignItems: "center",
@@ -343,10 +246,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#111",
   },
-  categoryRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
   categoryButton: {
     width: 56,
     height: 56,
@@ -363,43 +262,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     gap: 24,
-  },
-  mentionCard: {
-    width: 130,
-    alignItems: "center",
-  },
-  mentionEmoji: {
-    fontSize: 28,
-    marginBottom: -8,
-    zIndex: 2,
-  },
-  mentionImage: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: "#D9D9D9",
-  },
-  emptyMention: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: "#D9D9D9",
-  },
-  mentionLabel: {
-    marginTop: 8,
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#111",
-  },
-  mentionName: {
-    fontSize: 12,
-    color: "#777",
-    maxWidth: 120,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
   categoriesRow: {
     flexDirection: "row",

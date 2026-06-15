@@ -1,8 +1,14 @@
+import LoadingScreen from "@/components/LoadingScreen";
+import OptionPicker from "@/components/OptionPicker";
+import { CATEGORIES_WITH_OTHER } from "@/constants/categories";
+import { Colors } from "@/constants/colors";
+import { WEATHER_OPTIONS } from "@/constants/seasons";
+import { getClothingImageUrl } from "@/lib/clothing-images";
+import { supabase } from "@/lib/supabase";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Image,
   ScrollView,
@@ -12,10 +18,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { supabase } from "../../../lib/supabase";
-
-const categories = ["Top", "Bottom", "Dress", "Jacket", "Shoes", "Accessory"];
-const seasons = ["Lente", "Zomer", "Herfst", "Winter", "Alle seizoenen"];
 
 export default function EditClothingScreen() {
   const router = useRouter();
@@ -47,13 +49,13 @@ export default function EditClothingScreen() {
 
     if (error) {
       console.log("Fetch item error:", error);
-      Alert.alert("Error", "Could not load clothing item.");
+      Alert.alert("Fout", "Kon kledingstuk niet laden.");
       setLoading(false);
       return;
     }
 
     if (!data) {
-      Alert.alert("Not found", "This clothing item could not be found.");
+      Alert.alert("Niet gevonden", "Dit kledingstuk kon niet worden gevonden.");
       setLoading(false);
       return;
     }
@@ -83,7 +85,7 @@ export default function EditClothingScreen() {
     setSaving(false);
 
     if (error) {
-      Alert.alert("Error", "Could not save changes.");
+      Alert.alert("Fout", "Kon wijzigingen niet opslaan.");
       console.log(error);
       return;
     }
@@ -92,11 +94,7 @@ export default function EditClothingScreen() {
   }
 
   if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
+    return <LoadingScreen backgroundColor={Colors.background} />;
   }
 
   return (
@@ -109,66 +107,45 @@ export default function EditClothingScreen() {
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
 
-        <Text style={styles.title}>Edit item</Text>
+        <Text style={styles.title}>Bewerken</Text>
 
         <View style={styles.iconButton} />
       </View>
 
       {imageUrl ? (
-        <Image source={{ uri: imageUrl }} style={styles.image} />
+        <Image
+          source={{ uri: getClothingImageUrl(imageUrl) }}
+          style={styles.image}
+        />
       ) : (
         <View style={styles.imagePlaceholder}>
           <Ionicons name="shirt-outline" size={48} color="#aaa" />
         </View>
       )}
 
-      <Text style={styles.label}>Name</Text>
+      <Text style={styles.label}>Naam</Text>
       <TextInput
         value={name}
         onChangeText={setName}
-        placeholder="Item name"
+        placeholder="Naam kledingstuk"
         style={styles.input}
       />
 
-      <Text style={styles.label}>Category</Text>
-      <View style={styles.options}>
-        {categories.map((item) => (
-          <TouchableOpacity
-            key={item}
-            style={[styles.option, category === item && styles.optionSelected]}
-            onPress={() => setCategory(item)}
-          >
-            <Text
-              style={[
-                styles.optionText,
-                category === item && styles.optionTextSelected,
-              ]}
-            >
-              {item}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <Text style={styles.label}>Soort</Text>
+      <OptionPicker
+        options={CATEGORIES_WITH_OTHER}
+        value={category}
+        onChange={setCategory}
+        variant="pill"
+      />
 
-      <Text style={styles.label}>Season</Text>
-      <View style={styles.options}>
-        {seasons.map((item) => (
-          <TouchableOpacity
-            key={item}
-            style={[styles.option, season === item && styles.optionSelected]}
-            onPress={() => setSeason(item)}
-          >
-            <Text
-              style={[
-                styles.optionText,
-                season === item && styles.optionTextSelected,
-              ]}
-            >
-              {item}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <Text style={styles.label}>Geschikt voor</Text>
+      <OptionPicker
+        options={WEATHER_OPTIONS}
+        value={season}
+        onChange={setSeason}
+        variant="pill"
+      />
 
       <TouchableOpacity
         style={styles.saveButton}
@@ -176,7 +153,7 @@ export default function EditClothingScreen() {
         disabled={saving}
       >
         <Text style={styles.saveButtonText}>
-          {saving ? "Saving..." : "Save changes"}
+          {saving ? "Opslaan..." : "Wijzigingen opslaan"}
         </Text>
       </TouchableOpacity>
     </ScrollView>
@@ -186,17 +163,11 @@ export default function EditClothingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FAF7F2",
+    backgroundColor: Colors.background,
   },
   content: {
     padding: 20,
     paddingBottom: 40,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#FAF7F2",
   },
   header: {
     flexDirection: "row",
@@ -208,7 +179,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: "#F3EFE8",
+    backgroundColor: Colors.cardSecondary,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -229,7 +200,7 @@ const styles = StyleSheet.create({
     height: 260,
     borderRadius: 24,
     marginBottom: 24,
-    backgroundColor: "#F3EFE8",
+    backgroundColor: Colors.cardSecondary,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -241,37 +212,13 @@ const styles = StyleSheet.create({
     marginTop: 14,
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: Colors.white,
     borderRadius: 16,
     padding: 14,
     fontSize: 16,
     color: "#2D2A26",
     borderWidth: 1,
-    borderColor: "#E8DFD3",
-  },
-  options: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  option: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 999,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#E8DFD3",
-  },
-  optionSelected: {
-    backgroundColor: "#2D2A26",
-    borderColor: "#2D2A26",
-  },
-  optionText: {
-    color: "#2D2A26",
-    fontWeight: "600",
-  },
-  optionTextSelected: {
-    color: "#fff",
+    borderColor: Colors.border,
   },
   saveButton: {
     backgroundColor: "#2D2A26",
@@ -281,7 +228,7 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   saveButtonText: {
-    color: "#fff",
+    color: Colors.white,
     fontSize: 16,
     fontWeight: "700",
   },

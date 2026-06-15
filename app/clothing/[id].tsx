@@ -1,8 +1,14 @@
+import LoadingScreen from "@/components/LoadingScreen";
+import WearChart from "@/components/WearChart";
+import { getClothingImageUrl } from "@/lib/clothing-images";
+import { logClothingWear } from "@/lib/log-clothing-wear";
+import { supabase } from "@/lib/supabase";
+import { ClothingItem, MonthlyWear } from "@/types/clothing";
+import { formatLastWornDate } from "@/utils/dates";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Image,
   ScrollView,
@@ -11,21 +17,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { supabase } from "../../lib/supabase";
-
-type ClothingItem = {
-  id: string;
-  name: string | null;
-  image_url: string;
-  last_worn: string | null;
-  season: string | null;
-  marked_for_declutter: boolean;
-};
-
-type MonthlyWear = {
-  month: string;
-  count: number;
-};
 
 const MONTHS = [
   "Jan",
@@ -117,30 +108,18 @@ export default function ClothingDetailScreen() {
     }
   }
 
-  async function logClothingWear() {
+  async function handleLogWear() {
     if (!item) return;
 
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    const { error } = await logClothingWear(item.id);
 
-      if (!user) return;
-
-      const { error } = await supabase.from("clothing_wear_logs").insert({
-        clothing_id: item.id,
-        user_id: user.id,
-        worn_at: new Date().toISOString(),
-      });
-
-      if (error) throw error;
-
-      Alert.alert("Gelukt", "Kledingstuk is gelogd.");
-      loadItem();
-    } catch (error) {
-      console.log("Error logging clothing:", error);
+    if (error) {
       Alert.alert("Fout", "Kon kledingstuk niet loggen.");
+      return;
     }
+
+    Alert.alert("Gelukt", "Kledingstuk is gelogd.");
+    loadItem();
   }
 
   async function deleteClothingItem() {
@@ -190,56 +169,8 @@ export default function ClothingDetailScreen() {
     loadItem();
   }
 
-  function formatDate(dateString: string | null) {
-    if (!dateString) return "Nog nooit gedragen";
-
-    return new Date(dateString).toLocaleDateString("nl-NL", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  }
-
-  function WearChart({ data }: { data: MonthlyWear[] }) {
-    const maxCount = Math.max(...data.map((item) => item.count), 1);
-
-    return (
-      <View style={styles.chartCard}>
-        <View style={styles.chartHeader}>
-          <Text style={styles.chartTitle}>Gedragen dit jaar</Text>
-          <Text style={styles.chartSubtitle}>Aantal logs per maand</Text>
-        </View>
-
-        <View style={styles.chart}>
-          {data.map((item) => (
-            <View key={item.month} style={styles.chartItem}>
-              <Text style={styles.chartCount}>{item.count}</Text>
-
-              <View style={styles.barBackground}>
-                <View
-                  style={[
-                    styles.bar,
-                    {
-                      height: `${(item.count / maxCount) * 100}%`,
-                    },
-                  ]}
-                />
-              </View>
-
-              <Text style={styles.chartLabel}>{item.month}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
-    );
-  }
-
   if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator />
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   if (!item) {
@@ -268,13 +199,18 @@ export default function ClothingDetailScreen() {
         </TouchableOpacity>
       </View>
 
-      <Image source={{ uri: item.image_url }} style={styles.image} />
+      <Image
+        source={{ uri: getClothingImageUrl(item.image_url) }}
+        style={styles.image}
+      />
 
       <Text style={styles.name}>{item.name || "Naamloos kledingstuk"}</Text>
 
       <View style={styles.statCard}>
         <Text style={styles.statLabel}>Laatst gedragen</Text>
-        <Text style={styles.statValue}>{formatDate(item.last_worn)}</Text>
+        <Text style={styles.statValue}>
+          {formatLastWornDate(item.last_worn ?? null)}
+        </Text>
       </View>
 
       <View style={styles.statCard}>
@@ -306,7 +242,7 @@ export default function ClothingDetailScreen() {
       )}
 
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.logButton} onPress={logClothingWear}>
+        <TouchableOpacity style={styles.logButton} onPress={handleLogWear}>
           <Text style={styles.buttonText}>Log</Text>
         </TouchableOpacity>
 
@@ -326,137 +262,62 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-
   content: {
     padding: 20,
     paddingBottom: 40,
   },
-
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-
   backButton: {
     marginBottom: 20,
   },
-
   image: {
     width: "100%",
     height: 350,
     borderRadius: 20,
     backgroundColor: "#eee",
   },
-
   name: {
     fontSize: 26,
     fontWeight: "700",
     marginTop: 24,
     color: "#2f2f2f",
   },
-
   statCard: {
     marginTop: 16,
     padding: 16,
     borderRadius: 18,
     backgroundColor: "#f3f0ea",
   },
-
   statLabel: {
     fontSize: 13,
     color: "#777",
     marginBottom: 4,
   },
-
   statValue: {
     fontSize: 17,
     fontWeight: "700",
     color: "#2f2f2f",
   },
-
-  chartCard: {
-    marginTop: 18,
-    padding: 16,
-    borderRadius: 18,
-    backgroundColor: "#f3f0ea",
-  },
-
-  chartHeader: {
-    marginBottom: 16,
-  },
-
-  chartTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#2f2f2f",
-  },
-
-  chartSubtitle: {
-    fontSize: 13,
-    color: "#777",
-    marginTop: 2,
-  },
-
-  chart: {
-    height: 180,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-  },
-
-  chartItem: {
-    alignItems: "center",
-    flex: 1,
-  },
-
-  chartCount: {
-    fontSize: 11,
-    color: "#555",
-    marginBottom: 6,
-  },
-
-  barBackground: {
-    height: 110,
-    width: 12,
-    borderRadius: 999,
-    backgroundColor: "#ddd6cc",
-    justifyContent: "flex-end",
-    overflow: "hidden",
-  },
-
-  bar: {
-    width: "100%",
-    minHeight: 2,
-    borderRadius: 999,
-    backgroundColor: "#2f2f2f",
-  },
-
-  chartLabel: {
-    fontSize: 10,
-    color: "#777",
-    marginTop: 8,
-  },
-
   buttonContainer: {
     marginTop: 24,
     gap: 12,
   },
-
   logButton: {
     backgroundColor: "#2f2f2f",
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
   },
-
   deleteButton: {
     backgroundColor: "#b3261e",
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
   },
-
   buttonText: {
     color: "#fff",
     fontSize: 16,
@@ -468,7 +329,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-
   editButton: {
     width: 42,
     height: 42,
@@ -485,18 +345,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ffb86b",
   },
-
   declutterTitle: {
     fontSize: 18,
     fontWeight: "700",
     color: "#9a4f00",
   },
-
   declutterText: {
     marginTop: 8,
     color: "#7a5a40",
   },
-
   restoreButton: {
     marginTop: 14,
     backgroundColor: "#2f2f2f",
@@ -504,7 +361,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
   },
-
   restoreButtonText: {
     color: "#fff",
     fontWeight: "700",

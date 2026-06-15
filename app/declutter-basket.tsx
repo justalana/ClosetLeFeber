@@ -1,8 +1,11 @@
+import LoadingScreen from "@/components/LoadingScreen";
+import { getClothingImageUrl } from "@/lib/clothing-images";
+import { supabase } from "@/lib/supabase";
+import { ClothingItem } from "@/types/clothing";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Image,
   ScrollView,
@@ -11,16 +14,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { supabase } from "../lib/supabase";
-
-type ClothingItem = {
-  id: string;
-  name: string | null;
-  image_url: string;
-  category: string | null;
-  times_worn: number | null;
-  last_worn: string | null;
-};
 
 export default function DeclutterBasketScreen() {
   const router = useRouter();
@@ -60,13 +53,6 @@ export default function DeclutterBasketScreen() {
     } finally {
       setLoading(false);
     }
-  }
-
-  function getImageUrl(imageUrl: string) {
-    if (imageUrl.startsWith("http")) return imageUrl;
-
-    return supabase.storage.from("clothing-images").getPublicUrl(imageUrl).data
-      .publicUrl;
   }
 
   async function keepItem(itemId: string) {
@@ -111,11 +97,7 @@ export default function DeclutterBasketScreen() {
   }
 
   if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#46342c" />
-      </View>
-    );
+    return <LoadingScreen color="#46342c" backgroundColor="#f8f1e8" />;
   }
 
   return (
@@ -145,7 +127,7 @@ export default function DeclutterBasketScreen() {
               onPress={() => router.push(`/clothing/${item.id}` as any)}
             >
               <Image
-                source={{ uri: getImageUrl(item.image_url) }}
+                source={{ uri: getClothingImageUrl(item.image_url) }}
                 style={styles.image}
               />
 
@@ -196,12 +178,6 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     paddingBottom: 40,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#f8f1e8",
   },
   smallTitle: {
     fontSize: 14,

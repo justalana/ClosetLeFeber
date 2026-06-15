@@ -1,8 +1,13 @@
+import LoadingScreen from "@/components/LoadingScreen";
+import { WEATHER_FILTER_OPTIONS } from "@/constants/seasons";
+import { getClothingImageUrl } from "@/lib/clothing-images";
+import { supabase } from "@/lib/supabase";
+import { ClothingItem } from "@/types/clothing";
+import { getDaysSince, getLastWornRelative } from "@/utils/dates";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   ScrollView,
   StyleSheet,
@@ -10,18 +15,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { supabase } from "../../lib/supabase";
-
-type ClothingItem = {
-  id: string;
-  name: string | null;
-  image_url: string;
-  category: string | null;
-  last_worn: string | null;
-  season: string | null;
-  times_worn: number | null;
-  marked_for_declutter: boolean | null;
-};
 
 type DeclutterChoice = "keep" | "maybe" | "remove";
 
@@ -29,36 +22,8 @@ type SelectedItem = ClothingItem & {
   choice: DeclutterChoice;
 };
 
-const weatherOptions = [
-  { label: "Alles", value: "Alles", icon: "shirt-outline" },
-  { label: "Warm weer", value: "Warm weer", icon: "sunny-outline" },
-  { label: "Koud weer", value: "Koud weer", icon: "snow-outline" },
-  { label: "Hele jaar", value: "Hele jaar", icon: "partly-sunny-outline" },
-];
-
 function getWeatherLabel(value: string | null) {
   return value || "Hele jaar";
-}
-
-function getDaysSince(dateString: string | null) {
-  if (!dateString) return 9999;
-
-  const date = new Date(dateString);
-  const now = new Date();
-
-  const diff = now.getTime() - date.getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
-}
-
-function getLastWornText(dateString: string | null) {
-  if (!dateString) return "Nog nooit gedragen";
-
-  const days = getDaysSince(dateString);
-
-  if (days === 0) return "Vandaag gedragen";
-  if (days === 1) return "Gisteren gedragen";
-
-  return `${days} dagen geleden`;
 }
 
 export default function DeclutterScreen() {
@@ -118,8 +83,8 @@ export default function DeclutterScreen() {
         const aTimes = a.times_worn ?? 0;
         const bTimes = b.times_worn ?? 0;
 
-        const aDays = getDaysSince(a.last_worn);
-        const bDays = getDaysSince(b.last_worn);
+        const aDays = getDaysSince(a.last_worn ?? null);
+        const bDays = getDaysSince(b.last_worn ?? null);
 
         const aScore = aDays - aTimes * 20;
         const bScore = bDays - bTimes * 20;
@@ -183,11 +148,7 @@ export default function DeclutterScreen() {
   const keepItems = selectedItems.filter((item) => item.choice === "keep");
 
   if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#46342c" />
-      </View>
-    );
+    return <LoadingScreen color="#46342c" backgroundColor="#f8f1e8" />;
   }
 
   if (!selectedWeather) {
@@ -204,7 +165,7 @@ export default function DeclutterScreen() {
         </Text>
 
         <View style={styles.seasonGrid}>
-          {weatherOptions.map((weather) => (
+          {WEATHER_FILTER_OPTIONS.map((weather) => (
             <TouchableOpacity
               key={weather.value}
               style={styles.seasonCard}
@@ -284,7 +245,10 @@ export default function DeclutterScreen() {
 
       <View style={styles.cardContainer}>
         <View style={styles.declutterCard}>
-          <Image source={{ uri: currentItem.image_url }} style={styles.image} />
+          <Image
+            source={{ uri: getClothingImageUrl(currentItem.image_url) }}
+            style={styles.image}
+          />
 
           <View style={styles.cardContent}>
             <Text style={styles.itemName}>
@@ -298,7 +262,7 @@ export default function DeclutterScreen() {
               />
               <InfoRow
                 label="Laatst"
-                value={getLastWornText(currentItem.last_worn)}
+                value={getLastWornRelative(currentItem.last_worn ?? null)}
               />
               <InfoRow
                 label="Categorie"
@@ -306,7 +270,7 @@ export default function DeclutterScreen() {
               />
               <InfoRow
                 label="Geschikt voor"
-                value={getWeatherLabel(currentItem.season)}
+                value={getWeatherLabel(currentItem.season ?? null)}
               />
             </View>
           </View>
@@ -377,7 +341,7 @@ function SummarySection({
         items.map((item) => (
           <View key={`${item.id}-${item.choice}`} style={styles.summaryItem}>
             <Image
-              source={{ uri: item.image_url }}
+              source={{ uri: getClothingImageUrl(item.image_url) }}
               style={styles.summaryImage}
             />
 

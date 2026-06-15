@@ -1,8 +1,16 @@
+import LoadingScreen from "@/components/LoadingScreen";
+import { CATEGORIES } from "@/constants/categories";
+import { Colors } from "@/constants/colors";
+import { WEATHER_OPTIONS } from "@/constants/seasons";
+import { getClothingImageUrl } from "@/lib/clothing-images";
+import { logClothingWear } from "@/lib/log-clothing-wear";
+import { supabase } from "@/lib/supabase";
+import { ClothingItem } from "@/types/clothing";
+import { formatLastWornDate } from "@/utils/dates";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
-  ActivityIndicator,
   FlatList,
   Image,
   StyleSheet,
@@ -11,27 +19,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { supabase } from "../../lib/supabase";
-
-type ClothingItem = {
-  id: string;
-  name: string | null;
-  image_url: string;
-  category: string | null;
-  last_worn: string | null;
-  season: string | null;
-  marked_for_declutter: boolean | null;
-};
-
-const categories = [
-  { label: "Top", value: "Top" },
-  { label: "Broek/rok", value: "Bottom" },
-  { label: "Jurk", value: "Dress" },
-  { label: "Jas", value: "Jacket" },
-  { label: "Schoenen", value: "Shoes" },
-  { label: "Accessoire", value: "Accessory" },
-];
-const weatherOptions = ["Warm weer", "Koud weer", "Hele jaar"];
 
 export default function ClosetScreen() {
   const router = useRouter();
@@ -136,89 +123,20 @@ export default function ClosetScreen() {
     return matchesSearch && matchesCategory && matchesSeason;
   });
 
-  function formatDate(dateString: string | null) {
-    if (!dateString) return "Nog nooit gedragen";
+  async function handleLogWear(clothingId: string) {
+    const { error } = await logClothingWear(clothingId);
 
-    const date = new Date(dateString);
-
-    return date.toLocaleDateString("nl-NL", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-  }
-
-  function getImageUrl(imageUrl: string) {
-    if (imageUrl.startsWith("http")) {
-      return imageUrl;
+    if (error) {
+      alert("Kon kledingstuk niet loggen.");
+      return;
     }
 
-    return supabase.storage.from("clothing-images").getPublicUrl(imageUrl).data
-      .publicUrl;
-  }
-
-  async function logClothingWear(clothingId: string) {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) return;
-
-      const { error: insertError } = await supabase
-        .from("clothing_wear_logs")
-        .insert({
-          clothing_id: clothingId,
-          user_id: user.id,
-          worn_at: new Date().toISOString(),
-        });
-
-      if (insertError) {
-        console.log("Error logging clothing:", insertError.message);
-        alert("Kon kledingstuk niet loggen.");
-        return;
-      }
-
-      const { data: clothingData, error: fetchError } = await supabase
-        .from("clothes")
-        .select("times_worn")
-        .eq("id", clothingId)
-        .single();
-
-      if (fetchError) {
-        console.log("Error fetching times_worn:", fetchError.message);
-        return;
-      }
-
-      const currentTimesWorn = clothingData?.times_worn || 0;
-
-      const { error: updateError } = await supabase
-        .from("clothes")
-        .update({
-          times_worn: currentTimesWorn + 1,
-          last_worn: new Date().toISOString(),
-        })
-        .eq("id", clothingId);
-
-      if (updateError) {
-        console.log("Error updating times_worn:", updateError.message);
-        return;
-      }
-
-      loadClothes();
-      alert("Kledingstuk gelogd!");
-    } catch (err) {
-      console.log(err);
-      alert("Er ging iets mis.");
-    }
+    loadClothes();
+    alert("Kledingstuk gelogd!");
   }
 
   if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -262,12 +180,12 @@ export default function ClosetScreen() {
             onPress={() => router.push(`/clothing/${item.id}` as any)}
           >
             <Image
-              source={{ uri: getImageUrl(item.image_url) }}
+              source={{ uri: getClothingImageUrl(item.image_url) }}
               style={styles.image}
             />
 
             <Text style={styles.name} numberOfLines={1}>
-              {item.name || "Naamloos"}
+              {item.name || "Naamloos kledingstuk"}
             </Text>
 
             {item.marked_for_declutter && (
@@ -278,14 +196,14 @@ export default function ClosetScreen() {
             )}
 
             <Text style={styles.date}>
-              Laatst gedragen: {formatDate(item.last_worn)}
+              Laatst gedragen: {formatLastWornDate(item.last_worn ?? null)}
             </Text>
 
             <TouchableOpacity
               style={styles.logButton}
               onPress={(event) => {
                 event.stopPropagation();
-                logClothingWear(item.id);
+                handleLogWear(item.id);
               }}
             >
               <Text style={styles.logButtonText}>Loggen</Text>
@@ -310,7 +228,7 @@ export default function ClosetScreen() {
           <View style={styles.filterSection}>
             <Text style={styles.filterSectionTitle}>Soort</Text>
 
-            {categories.map((category) => (
+            {CATEGORIES.map((category) => (
               <TouchableOpacity
                 key={category.value}
                 style={styles.checkboxRow}
@@ -334,7 +252,7 @@ export default function ClosetScreen() {
           <View style={styles.filterSection}>
             <Text style={styles.filterSectionTitle}>Geschikt voor</Text>
 
-            {weatherOptions.map((season) => (
+            {WEATHER_OPTIONS.map((season) => (
               <TouchableOpacity
                 key={season}
                 style={styles.checkboxRow}
@@ -377,7 +295,7 @@ export default function ClosetScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F4EF",
+    backgroundColor: Colors.background,
   },
   searchRow: {
     flexDirection: "row",
@@ -539,11 +457,6 @@ const styles = StyleSheet.create({
     height: 58,
     borderRadius: 16,
     backgroundColor: "#6B4F3F",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  center: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },

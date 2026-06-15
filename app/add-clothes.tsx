@@ -1,3 +1,7 @@
+import OptionPicker from "@/components/OptionPicker";
+import { CATEGORIES_WITH_OTHER } from "@/constants/categories";
+import { Colors } from "@/constants/colors";
+import { DEFAULT_WEATHER, WEATHER_OPTIONS } from "@/constants/seasons";
 import { supabase } from "@/lib/supabase";
 import { decode } from "base64-arraybuffer";
 import * as ImagePicker from "expo-image-picker";
@@ -14,16 +18,6 @@ import {
   View,
 } from "react-native";
 
-const categories = [
-  { label: "Top", value: "Top" },
-  { label: "Broek/rok", value: "Bottom" },
-  { label: "Jurk", value: "Dress" },
-  { label: "Jas", value: "Jacket" },
-  { label: "Schoenen", value: "Shoes" },
-  { label: "Accessoire", value: "Accessory" },
-  { label: "Anders", value: "Other" },
-];
-
 export default function AddClothesScreen() {
   const router = useRouter();
 
@@ -31,9 +25,7 @@ export default function AddClothesScreen() {
   const [category, setCategory] = useState("Top");
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [loading, setLoading] = useState(false);
-  const weatherOptions = ["Warm weer", "Koud weer", "Hele jaar"];
-
-  const [season, setSeason] = useState("Hele jaar");
+  const [season, setSeason] = useState<string>(DEFAULT_WEATHER);
 
   async function pickImage() {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -85,14 +77,6 @@ export default function AddClothesScreen() {
 
         imageUrl = data.publicUrl;
       }
-      console.log("Current user:", user?.id);
-
-      console.log("Insert data:", {
-        user_id: user.id,
-        name: name.trim() || null,
-        category,
-        image_url: imageUrl,
-      });
 
       const { error } = await supabase.from("clothes").insert({
         user_id: user.id,
@@ -129,51 +113,19 @@ export default function AddClothesScreen() {
         />
 
         <Text style={styles.label}>Soort</Text>
-        <View style={styles.categoryGrid}>
-          {categories.map((item) => (
-            <Pressable
-              key={item.value}
-              style={[
-                styles.categoryButton,
-                category === item.value && styles.categoryButtonActive,
-              ]}
-              onPress={() => setCategory(item.value)}
-            >
-              <Text
-                style={[
-                  styles.categoryText,
-                  category === item.value && styles.categoryTextActive,
-                ]}
-              >
-                {item.label}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        <OptionPicker
+          options={CATEGORIES_WITH_OTHER}
+          value={category}
+          onChange={setCategory}
+        />
 
         <Text style={styles.label}>Geschikt voor</Text>
-
-        <View style={styles.optionsRow}>
-          {weatherOptions.map((item) => (
-            <Pressable
-              key={item}
-              style={[
-                styles.optionButton,
-                season === item && styles.optionButtonActive,
-              ]}
-              onPress={() => setSeason(item)}
-            >
-              <Text
-                style={[
-                  styles.optionText,
-                  season === item && styles.optionTextActive,
-                ]}
-              >
-                {item}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        <OptionPicker
+          options={WEATHER_OPTIONS}
+          value={season}
+          onChange={setSeason}
+          variant="pill"
+        />
 
         <Text style={styles.label}>Afbeelding</Text>
         <Pressable style={styles.imageButton} onPress={pickImage}>
@@ -202,7 +154,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 24,
-    backgroundColor: "#F8F5EF",
+    backgroundColor: Colors.background,
   },
   title: {
     fontSize: 26,
@@ -216,34 +168,13 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   input: {
-    backgroundColor: "white",
+    backgroundColor: Colors.white,
     padding: 14,
     borderRadius: 12,
     fontSize: 16,
   },
-  categoryGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  categoryButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    backgroundColor: "white",
-  },
-  categoryButtonActive: {
-    backgroundColor: "#6B8F71",
-  },
-  categoryText: {
-    color: "#333",
-    fontWeight: "500",
-  },
-  categoryTextActive: {
-    color: "white",
-  },
   imageButton: {
-    backgroundColor: "white",
+    backgroundColor: Colors.white,
     padding: 14,
     borderRadius: 12,
     alignItems: "center",
@@ -258,7 +189,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   saveButton: {
-    backgroundColor: "#6B8F71",
+    backgroundColor: Colors.success,
     padding: 16,
     borderRadius: 14,
     alignItems: "center",
@@ -268,34 +199,8 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   saveButtonText: {
-    color: "white",
+    color: Colors.white,
     fontWeight: "700",
     fontSize: 16,
-  },
-
-  optionsRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-
-  optionButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    backgroundColor: "#F1EDE8",
-  },
-
-  optionButtonActive: {
-    backgroundColor: "#2F2A26",
-  },
-
-  optionText: {
-    color: "#2F2A26",
-    fontWeight: "500",
-  },
-
-  optionTextActive: {
-    color: "#FFFFFF",
   },
 });

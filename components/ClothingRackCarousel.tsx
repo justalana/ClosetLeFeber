@@ -1,3 +1,5 @@
+import { getClothingImageUrl } from "@/lib/clothing-images";
+import { CarouselClothingItem } from "@/types/clothing";
 import { useRef, useState } from "react";
 import {
   Animated,
@@ -14,12 +16,7 @@ const ITEM_WIDTH = width * 0.48;
 const ITEM_SPACING = 16;
 const SNAP_INTERVAL = ITEM_WIDTH + ITEM_SPACING;
 
-export type CarouselClothingItem = {
-  id: string;
-  name: string | null;
-  image_url: string;
-  times_worn: number | null;
-};
+export type { CarouselClothingItem };
 
 type Props = {
   items: CarouselClothingItem[];
@@ -115,13 +112,13 @@ export default function ClothingRackCarousel({
                   ]}
                 >
                   <Image
-                    source={{ uri: item.image_url }}
+                    source={{ uri: getClothingImageUrl(item.image_url) }}
                     style={styles.image}
                   />
 
                   <View style={styles.infoBox}>
                     <Text style={styles.itemName} numberOfLines={1}>
-                      {item.name || "Naamloos item"}
+                      {item.name || "Naamloos kledingstuk"}
                     </Text>
 
                     <Text style={styles.wornText}>
