@@ -107,9 +107,7 @@ export default function OutfitScreen() {
   }
 
   if (loading) {
-    return (
-      <LoadingScreen color={Colors.primary} backgroundColor={Colors.background} />
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -177,12 +175,12 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 30,
     fontWeight: "900",
-    color: "#2F2A26",
+    color: Colors.primary,
   },
   subtitle: {
     marginTop: 6,
     fontSize: 15,
-    color: "#7B6F66",
+    color: Colors.textSecondary,
     width: 250,
     lineHeight: 21,
   },
@@ -194,7 +192,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: Colors.black,
     shadowOpacity: 0.14,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 5 },
@@ -212,19 +210,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 24,
     padding: 24,
     borderRadius: 24,
-    backgroundColor: "#F6EFE7",
+    backgroundColor: Colors.accent.lavenderLight,
     borderWidth: 2,
-    borderColor: "#E2D3C4",
+    borderColor: Colors.accent.lavender,
   },
   emptyTitle: {
     fontSize: 20,
     fontWeight: "900",
-    color: "#2F2A26",
+    color: Colors.text,
     marginBottom: 8,
   },
   emptyText: {
     fontSize: 15,
     lineHeight: 22,
-    color: "#7B6F66",
+    color: Colors.textSecondary,
   },
 });

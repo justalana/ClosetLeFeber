@@ -1,4 +1,5 @@
 import { getClothingImageUrl } from "@/lib/clothing-images";
+import { Colors } from "@/constants/colors";
 import { CarouselClothingItem } from "@/types/clothing";
 import { useRef, useState } from "react";
 import {
@@ -143,7 +144,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "800",
-    color: "#2F2A26",
+    color: Colors.text,
     marginBottom: 12,
     paddingHorizontal: 24,
   },
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     width: width * 0.76,
     height: 58,
     borderTopWidth: 5,
-    borderColor: "#2F2A26",
+    borderColor: Colors.text,
     borderRadius: 100,
   },
 
@@ -179,12 +180,12 @@ const styles = StyleSheet.create({
   card: {
     width: ITEM_WIDTH,
     height: 210,
-    backgroundColor: "#F6EFE7",
+    backgroundColor: Colors.accent.peachLight,
     borderRadius: 26,
     borderWidth: 2,
-    borderColor: "#E2D3C4",
+    borderColor: Colors.border,
     overflow: "hidden",
-    shadowColor: "#000",
+    shadowColor: Colors.black,
     shadowOpacity: 0.12,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
@@ -192,15 +193,16 @@ const styles = StyleSheet.create({
   },
 
   selectedCard: {
-    borderColor: "#A66A4C",
+    borderColor: Colors.primary,
     borderWidth: 3,
+    backgroundColor: Colors.accent.peachLight,
   },
 
   image: {
     width: "100%",
     height: 145,
     resizeMode: "cover",
-    backgroundColor: "#DDD",
+    backgroundColor: Colors.cardSecondary,
   },
 
   infoBox: {
@@ -210,13 +212,13 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#2F2A26",
+    color: Colors.text,
   },
 
   wornText: {
     marginTop: 3,
     fontSize: 13,
-    color: "#7B6F66",
+    color: Colors.textSecondary,
     fontWeight: "600",
   },
 });

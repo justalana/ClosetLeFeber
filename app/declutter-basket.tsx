@@ -1,4 +1,5 @@
 import LoadingScreen from "@/components/LoadingScreen";
+import { Colors } from "@/constants/colors";
 import { getClothingImageUrl } from "@/lib/clothing-images";
 import { supabase } from "@/lib/supabase";
 import { ClothingItem } from "@/types/clothing";
@@ -97,7 +98,7 @@ export default function DeclutterBasketScreen() {
   }
 
   if (loading) {
-    return <LoadingScreen color="#46342c" backgroundColor="#f8f1e8" />;
+    return <LoadingScreen />;
   }
 
   return (
@@ -112,7 +113,7 @@ export default function DeclutterBasketScreen() {
 
       {items.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Ionicons name="basket-outline" size={42} color="#8d6e63" />
+          <Ionicons name="basket-outline" size={42} color={Colors.primary} />
           <Text style={styles.emptyTitle}>Je mand is leeg</Text>
           <Text style={styles.emptyText}>
             Items die je met “Weg” markeert komen hier terecht.
@@ -173,7 +174,7 @@ export default function DeclutterBasketScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f1e8",
+    backgroundColor: Colors.background,
   },
   content: {
     padding: 20,
@@ -181,39 +182,39 @@ const styles = StyleSheet.create({
   },
   smallTitle: {
     fontSize: 14,
-    color: "#8d6e63",
+    color: Colors.textSecondary,
     fontWeight: "800",
     marginBottom: 6,
   },
   title: {
     fontSize: 30,
     fontWeight: "900",
-    color: "#46342c",
+    color: Colors.text,
     marginBottom: 10,
   },
   description: {
     fontSize: 16,
-    color: "#6f5a50",
+    color: Colors.textSecondary,
     lineHeight: 22,
     marginBottom: 22,
   },
   emptyCard: {
-    backgroundColor: "#fffaf4",
+    backgroundColor: Colors.card,
     borderRadius: 22,
     padding: 24,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#ead8c8",
+    borderColor: Colors.border,
   },
   emptyTitle: {
     fontSize: 21,
     fontWeight: "900",
-    color: "#46342c",
+    color: Colors.text,
     marginTop: 10,
   },
   emptyText: {
     textAlign: "center",
-    color: "#8d6e63",
+    color: Colors.textSecondary,
     marginTop: 6,
   },
   list: {
@@ -221,18 +222,18 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: "row",
-    backgroundColor: "#fffaf4",
+    backgroundColor: Colors.card,
     borderRadius: 20,
     padding: 12,
     borderWidth: 1,
-    borderColor: "#C45A4D",
+    borderColor: Colors.danger,
     gap: 12,
   },
   image: {
     width: 86,
     height: 86,
     borderRadius: 16,
-    backgroundColor: "#ead8c8",
+    backgroundColor: Colors.cardSecondary,
   },
   cardInfo: {
     flex: 1,
@@ -240,10 +241,10 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 17,
     fontWeight: "900",
-    color: "#46342c",
+    color: Colors.text,
   },
   itemMeta: {
-    color: "#8d6e63",
+    color: Colors.textSecondary,
     marginTop: 3,
     marginBottom: 12,
   },
@@ -253,25 +254,25 @@ const styles = StyleSheet.create({
   },
   keepButton: {
     flex: 1,
-    backgroundColor: "#F3EFE8",
+    backgroundColor: Colors.cardSecondary,
     paddingVertical: 9,
     borderRadius: 12,
     alignItems: "center",
   },
   keepButtonText: {
-    color: "#46342c",
+    color: Colors.text,
     fontWeight: "800",
     fontSize: 12,
   },
   doneButton: {
     flex: 1,
-    backgroundColor: "#8A2F24",
+    backgroundColor: Colors.danger,
     paddingVertical: 9,
     borderRadius: 12,
     alignItems: "center",
   },
   doneButtonText: {
-    color: "#fffaf4",
+    color: Colors.white,
     fontWeight: "800",
     fontSize: 12,
   },

@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Colors } from "@/constants/colors";
 import { Tabs, router } from "expo-router";
 import { Image, Platform, TouchableOpacity, View } from "react-native";
 
@@ -9,13 +10,13 @@ export default function TabLayout() {
         headerShown: true,
 
         headerStyle: {
-          backgroundColor: "#F7F3EE",
+          backgroundColor: Colors.background,
         },
 
         headerShadowVisible: false,
 
         headerTitleStyle: {
-          color: "#2E2925",
+          color: Colors.text,
           fontWeight: "700",
         },
 
@@ -31,25 +32,26 @@ export default function TabLayout() {
             <TouchableOpacity
               onPress={() => router.push("/declutter-basket" as any)}
             >
-              <Ionicons name="basket-outline" size={28} color="#2E2925" />
+              <Ionicons name="basket-outline" size={28} color={Colors.danger} />
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => router.push("/profile")}>
               <Ionicons
                 name="person-circle-outline"
                 size={30}
-                color="#2E2925"
+                color={Colors.accent.sky}
               />
             </TouchableOpacity>
           </View>
         ),
 
-        tabBarActiveTintColor: "#2E2925",
-        tabBarInactiveTintColor: "#8B8178",
+        tabBarActiveTintColor: Colors.primary,
+        tabBarInactiveTintColor: Colors.textLight,
 
         tabBarStyle: {
-          backgroundColor: "#F7F3EE",
-          borderTopWidth: 0,
+          backgroundColor: Colors.card,
+          borderTopWidth: 1,
+          borderTopColor: Colors.border,
 
           height: Platform.OS === "android" ? 90 : 75,
           paddingBottom: Platform.OS === "android" ? 24 : 12,

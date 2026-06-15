@@ -1,6 +1,6 @@
+import { Colors } from "@/constants/colors";
+import { supabase } from "@/lib/supabase";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
-import { supabase } from "../lib/supabase";
 
 export default function ProfileScreen() {
   async function logout() {
@@ -21,28 +21,25 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F7F3EE",
+    backgroundColor: Colors.background,
     padding: 24,
     justifyContent: "center",
     alignItems: "center",
   },
-
   title: {
     fontSize: 32,
     fontWeight: "700",
-    color: "#2E2925",
+    color: Colors.text,
     marginBottom: 32,
   },
-
   logoutButton: {
-    backgroundColor: "#2E2925",
+    backgroundColor: Colors.primary,
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 18,
   },
-
   logoutButtonText: {
-    color: "#FFFFFF",
+    color: Colors.white,
     fontSize: 16,
     fontWeight: "700",
   },

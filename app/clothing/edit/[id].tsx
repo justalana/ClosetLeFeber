@@ -104,7 +104,7 @@ export default function EditClothingScreen() {
           onPress={() => router.back()}
           style={styles.iconButton}
         >
-          <Ionicons name="arrow-back" size={24} color="#333" />
+          <Ionicons name="arrow-back" size={24} color={Colors.text} />
         </TouchableOpacity>
 
         <Text style={styles.title}>Bewerken</Text>
@@ -119,7 +119,7 @@ export default function EditClothingScreen() {
         />
       ) : (
         <View style={styles.imagePlaceholder}>
-          <Ionicons name="shirt-outline" size={48} color="#aaa" />
+          <Ionicons name="shirt-outline" size={48} color={Colors.textLight} />
         </View>
       )}
 
@@ -186,14 +186,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#2D2A26",
+    color: Colors.text,
   },
   image: {
     width: "100%",
     height: 260,
     borderRadius: 24,
     marginBottom: 24,
-    backgroundColor: "#eee",
+    backgroundColor: Colors.cardSecondary,
   },
   imagePlaceholder: {
     width: "100%",
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#2D2A26",
+    color: Colors.text,
     marginBottom: 8,
     marginTop: 14,
   },
@@ -216,12 +216,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 14,
     fontSize: 16,
-    color: "#2D2A26",
+    color: Colors.text,
     borderWidth: 1,
     borderColor: Colors.border,
   },
   saveButton: {
-    backgroundColor: "#2D2A26",
+    backgroundColor: Colors.primary,
     padding: 16,
     borderRadius: 18,
     alignItems: "center",

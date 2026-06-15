@@ -1,4 +1,5 @@
 import AuthScreenLayout from "@/components/AuthScreenLayout";
+import { Colors } from "@/constants/colors";
 import { supabase } from "@/lib/supabase";
 import { Link, router } from "expo-router";
 import { useState } from "react";
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 20,
     textAlign: "center",
-    color: "#2E2925",
+    color: Colors.text,
     fontWeight: "600",
   },
 });

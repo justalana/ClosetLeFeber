@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   chipActive: {
-    backgroundColor: Colors.success,
+    backgroundColor: Colors.primary,
   },
   chipText: {
     color: Colors.text,
@@ -86,11 +86,11 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
   },
   pillActive: {
-    backgroundColor: "#2D2A26",
-    borderColor: "#2D2A26",
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   pillText: {
-    color: "#2D2A26",
+    color: Colors.text,
     fontWeight: "600",
   },
   pillTextActive: {

@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
+import { Colors } from "@/constants/colors";
 import { MonthlyWear } from "@/types/clothing";
 
 type Props = {
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
     marginTop: 18,
     padding: 16,
     borderRadius: 18,
-    backgroundColor: "#f3f0ea",
+    backgroundColor: Colors.cardSecondary,
   },
   header: {
     marginBottom: 16,
@@ -50,11 +51,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#2f2f2f",
+    color: Colors.text,
   },
   subtitle: {
     fontSize: 13,
-    color: "#777",
+    color: Colors.textSecondary,
     marginTop: 2,
   },
   chart: {
@@ -69,14 +70,14 @@ const styles = StyleSheet.create({
   },
   count: {
     fontSize: 11,
-    color: "#555",
+    color: Colors.textSecondary,
     marginBottom: 6,
   },
   barBackground: {
     height: 110,
     width: 12,
     borderRadius: 999,
-    backgroundColor: "#ddd6cc",
+    backgroundColor: Colors.border,
     justifyContent: "flex-end",
     overflow: "hidden",
   },
@@ -84,11 +85,11 @@ const styles = StyleSheet.create({
     width: "100%",
     minHeight: 2,
     borderRadius: 999,
-    backgroundColor: "#2f2f2f",
+    backgroundColor: Colors.accent.peach,
   },
   label: {
     fontSize: 10,
-    color: "#777",
+    color: Colors.textSecondary,
     marginTop: 8,
   },
 });

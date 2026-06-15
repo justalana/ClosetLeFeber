@@ -8,10 +8,10 @@ type Props = {
 
 export default function LoadingScreen({
   color = Colors.primary,
-  backgroundColor,
+  backgroundColor = Colors.background,
 }: Props) {
   return (
-    <View style={[styles.center, backgroundColor && { backgroundColor }]}>
+    <View style={[styles.center, { backgroundColor }]}>
       <ActivityIndicator size="large" color={color} />
     </View>
   );

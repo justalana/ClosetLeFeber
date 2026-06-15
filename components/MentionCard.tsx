@@ -1,15 +1,25 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { getClothingImageUrl } from "@/lib/clothing-images";
+import { Colors, MentionTint, MentionTints } from "@/constants/colors";
 import { ClothingItem } from "@/types/clothing";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type Props = {
   item: ClothingItem | null;
   label: string;
   emoji: string;
+  tint: MentionTint;
   onPress: () => void;
 };
 
-export default function MentionCard({ item, label, emoji, onPress }: Props) {
+export default function MentionCard({
+  item,
+  label,
+  emoji,
+  tint,
+  onPress,
+}: Props) {
+  const tintColors = MentionTints[tint];
+
   return (
     <TouchableOpacity
       style={styles.card}
@@ -19,16 +29,23 @@ export default function MentionCard({ item, label, emoji, onPress }: Props) {
     >
       <Text style={styles.emoji}>{emoji}</Text>
 
-      {item ? (
-        <Image
-          source={{ uri: getClothingImageUrl(item.image_url) }}
-          style={styles.image}
-        />
-      ) : (
-        <View style={styles.empty} />
-      )}
+      <View
+        style={[
+          styles.imageRing,
+          { borderColor: tintColors.ring, backgroundColor: tintColors.bg },
+        ]}
+      >
+        {item ? (
+          <Image
+            source={{ uri: getClothingImageUrl(item.image_url) }}
+            style={styles.image}
+          />
+        ) : (
+          <View style={styles.empty} />
+        )}
+      </View>
 
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { color: tintColors.label }]}>{label}</Text>
       <Text style={styles.name} numberOfLines={1}>
         {item?.name || "Naamloos kledingstuk"}
       </Text>
@@ -46,27 +63,34 @@ const styles = StyleSheet.create({
     marginBottom: -8,
     zIndex: 2,
   },
+  imageRing: {
+    width: 118,
+    height: 118,
+    borderRadius: 59,
+    borderWidth: 3,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   image: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: "#D9D9D9",
+    width: 106,
+    height: 106,
+    borderRadius: 53,
+    backgroundColor: Colors.cardSecondary,
   },
   empty: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    backgroundColor: "#D9D9D9",
+    width: 106,
+    height: 106,
+    borderRadius: 53,
+    backgroundColor: Colors.cardSecondary,
   },
   label: {
     marginTop: 8,
     fontSize: 13,
-    fontWeight: "600",
-    color: "#111",
+    fontWeight: "700",
   },
   name: {
     fontSize: 12,
-    color: "#777",
+    color: Colors.textSecondary,
     maxWidth: 120,
   },
 });

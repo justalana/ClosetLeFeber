@@ -1,4 +1,5 @@
 import LoadingScreen from "@/components/LoadingScreen";
+import { Colors } from "@/constants/colors";
 import WearChart from "@/components/WearChart";
 import { getClothingImageUrl } from "@/lib/clothing-images";
 import { logClothingWear } from "@/lib/log-clothing-wear";
@@ -188,14 +189,14 @@ export default function ClothingDetailScreen() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="#2f2f2f" />
+          <Ionicons name="arrow-back" size={24} color={Colors.text} />
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.editButton}
           onPress={() => router.push(`/clothing/edit/${item.id}` as any)}
         >
-          <Ionicons name="create-outline" size={22} color="#333" />
+          <Ionicons name="create-outline" size={22} color={Colors.text} />
         </TouchableOpacity>
       </View>
 
@@ -260,7 +261,7 @@ export default function ClothingDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
   content: {
     padding: 20,
@@ -270,6 +271,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: Colors.background,
   },
   backButton: {
     marginBottom: 20,
@@ -278,48 +280,48 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 350,
     borderRadius: 20,
-    backgroundColor: "#eee",
+    backgroundColor: Colors.cardSecondary,
   },
   name: {
     fontSize: 26,
     fontWeight: "700",
     marginTop: 24,
-    color: "#2f2f2f",
+    color: Colors.text,
   },
   statCard: {
     marginTop: 16,
     padding: 16,
     borderRadius: 18,
-    backgroundColor: "#f3f0ea",
+    backgroundColor: Colors.cardSecondary,
   },
   statLabel: {
     fontSize: 13,
-    color: "#777",
+    color: Colors.textSecondary,
     marginBottom: 4,
   },
   statValue: {
     fontSize: 17,
     fontWeight: "700",
-    color: "#2f2f2f",
+    color: Colors.text,
   },
   buttonContainer: {
     marginTop: 24,
     gap: 12,
   },
   logButton: {
-    backgroundColor: "#2f2f2f",
+    backgroundColor: Colors.success,
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
   },
   deleteButton: {
-    backgroundColor: "#b3261e",
+    backgroundColor: Colors.danger,
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
   },
   buttonText: {
-    color: "#fff",
+    color: Colors.white,
     fontSize: 16,
     fontWeight: "700",
   },
@@ -333,7 +335,7 @@ const styles = StyleSheet.create({
     width: 42,
     height: 42,
     borderRadius: 21,
-    backgroundColor: "#F3EFE8",
+    backgroundColor: Colors.cardSecondary,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -341,28 +343,28 @@ const styles = StyleSheet.create({
     marginTop: 18,
     padding: 16,
     borderRadius: 18,
-    backgroundColor: "#fff3e8",
+    backgroundColor: Colors.warningLight,
     borderWidth: 1,
-    borderColor: "#ffb86b",
+    borderColor: Colors.warning,
   },
   declutterTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#9a4f00",
+    color: Colors.primary,
   },
   declutterText: {
     marginTop: 8,
-    color: "#7a5a40",
+    color: Colors.textSecondary,
   },
   restoreButton: {
     marginTop: 14,
-    backgroundColor: "#2f2f2f",
+    backgroundColor: Colors.primary,
     paddingVertical: 10,
     borderRadius: 12,
     alignItems: "center",
   },
   restoreButtonText: {
-    color: "#fff",
+    color: Colors.white,
     fontWeight: "700",
   },
 });

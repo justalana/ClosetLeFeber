@@ -1,7 +1,7 @@
 import LoadingScreen from "@/components/LoadingScreen";
 import MentionCard from "@/components/MentionCard";
 import { HOME_CATEGORIES } from "@/constants/categories";
-import { Colors } from "@/constants/colors";
+import { CategoryColors, Colors } from "@/constants/colors";
 import { getClothingImageUrl } from "@/lib/clothing-images";
 import { supabase } from "@/lib/supabase";
 import { ClothingItem } from "@/types/clothing";
@@ -91,12 +91,16 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <Text style={styles.title}>Hey {userName} !</Text>
+        <Text style={styles.title}>
+          Hey <Text style={styles.titleAccent}>{userName}</Text> !
+        </Text>
         <Text style={styles.quote}>Kleine stapjes geven ook overzicht.</Text>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Vergeet mij niet :(</Text>
+      <View style={[styles.section, styles.forgottenSection]}>
+        <Text style={[styles.sectionTitle, styles.peachTitle]}>
+          Vergeet mij niet :(
+        </Text>
 
         <View style={styles.forgottenRow}>
           {leastWorn.map((item) => (
@@ -131,19 +135,29 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.categoriesRow}>
-          {HOME_CATEGORIES.map((category) => (
-            <TouchableOpacity
-              key={category.value}
-              style={styles.categoryButton}
-              onPress={() => goToCategory(category.value)}
-            >
-              <Image
-                source={category.image!}
-                style={styles.categoryIcon}
-                resizeMode="contain"
-              />
-            </TouchableOpacity>
-          ))}
+          {HOME_CATEGORIES.map((category) => {
+            const catColor = CategoryColors[category.value];
+
+            return (
+              <TouchableOpacity
+                key={category.value}
+                style={[
+                  styles.categoryButton,
+                  catColor && {
+                    backgroundColor: catColor.bg,
+                    borderColor: catColor.border,
+                  },
+                ]}
+                onPress={() => goToCategory(category.value)}
+              >
+                <Image
+                  source={category.image!}
+                  style={styles.categoryIcon}
+                  resizeMode="contain"
+                />
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </View>
 
@@ -155,6 +169,7 @@ export default function HomeScreen() {
             item={mostWornItem}
             label="Favoriet"
             emoji="⭐"
+            tint="honey"
             onPress={() =>
               mostWornItem && router.push(`/clothing/${mostWornItem.id}` as any)
             }
@@ -164,6 +179,7 @@ export default function HomeScreen() {
             item={leastWornItem}
             label="Minst gedragen"
             emoji="☹️"
+            tint="lavender"
             onPress={() =>
               leastWornItem &&
               router.push(`/clothing/${leastWornItem.id}` as any)
@@ -191,21 +207,38 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "600",
-    color: "#111",
+    color: Colors.text,
+  },
+  titleAccent: {
+    color: Colors.primary,
+    fontWeight: "700",
   },
   quote: {
     fontSize: 14,
-    color: "#111",
+    color: Colors.textSecondary,
     marginTop: 4,
   },
   section: {
     paddingHorizontal: 28,
     marginBottom: 30,
   },
+  forgottenSection: {
+    backgroundColor: Colors.accent.peachLight,
+    marginHorizontal: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.accent.peach,
+  },
   sectionTitle: {
     fontSize: 16,
-    color: "#111",
+    fontWeight: "600",
+    color: Colors.text,
     marginBottom: 10,
+  },
+  peachTitle: {
+    color: Colors.accent.peach,
   },
   forgottenRow: {
     flexDirection: "row",
@@ -216,10 +249,10 @@ const styles = StyleSheet.create({
   clothingCard: {
     width: 78,
     height: 78,
-    borderRadius: 10,
+    borderRadius: 12,
     borderWidth: 2,
-    borderColor: "#111",
-    backgroundColor: "#D9D9D9",
+    borderColor: Colors.accent.peach,
+    backgroundColor: Colors.white,
     overflow: "hidden",
   },
   clothingImage: {
@@ -227,15 +260,16 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   button: {
-    backgroundColor: "#D9D9D9",
-    borderRadius: 6,
-    paddingVertical: 8,
+    backgroundColor: Colors.primary,
+    borderRadius: 14,
+    paddingVertical: 12,
     alignItems: "center",
-    marginHorizontal: 38,
+    marginHorizontal: 20,
   },
   buttonText: {
-    color: "#111",
+    color: Colors.white,
     fontSize: 15,
+    fontWeight: "700",
   },
   sectionHeader: {
     flexDirection: "row",
@@ -244,13 +278,14 @@ const styles = StyleSheet.create({
   },
   seeAll: {
     fontSize: 12,
-    color: "#111",
+    color: Colors.primary,
+    fontWeight: "600",
   },
   categoryButton: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#D9D9D9",
+    borderWidth: 2,
     justifyContent: "center",
     alignItems: "center",
   },

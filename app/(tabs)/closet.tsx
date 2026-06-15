@@ -146,7 +146,7 @@ export default function ClosetScreen() {
           style={styles.filterButton}
           onPress={() => setFilterOpen(true)}
         >
-          <Ionicons name="filter-outline" size={28} color="#2F2F2F" />
+          <Ionicons name="filter-outline" size={28} color={Colors.accent.lavender} />
         </TouchableOpacity>
 
         <View style={styles.searchBox}>
@@ -155,10 +155,10 @@ export default function ClosetScreen() {
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={styles.searchInput}
-            placeholderTextColor="#777"
+            placeholderTextColor={Colors.textLight}
           />
 
-          <Ionicons name="search-outline" size={22} color="#2F2F2F" />
+          <Ionicons name="search-outline" size={22} color={Colors.text} />
         </View>
       </View>
 
@@ -190,7 +190,7 @@ export default function ClosetScreen() {
 
             {item.marked_for_declutter && (
               <View style={styles.declutterBadge}>
-                <Ionicons name="basket-outline" size={12} color="#8A2F24" />
+                <Ionicons name="basket-outline" size={12} color={Colors.danger} />
                 <Text style={styles.declutterBadgeText}>Declutter</Text>
               </View>
             )}
@@ -216,12 +216,12 @@ export default function ClosetScreen() {
         <View style={styles.filterPanel}>
           <View style={styles.filterHeader}>
             <View style={styles.filterTitleRow}>
-              <Ionicons name="filter-outline" size={20} color="#2F2F2F" />
+              <Ionicons name="filter-outline" size={20} color={Colors.text} />
               <Text style={styles.filterTitle}>Filters</Text>
             </View>
 
             <TouchableOpacity onPress={() => setFilterOpen(false)}>
-              <Ionicons name="chevron-back" size={28} color="#2F2F2F" />
+              <Ionicons name="chevron-back" size={28} color={Colors.text} />
             </TouchableOpacity>
           </View>
 
@@ -241,7 +241,7 @@ export default function ClosetScreen() {
                       : "square-outline"
                   }
                   size={22}
-                  color="#3F6473"
+                  color={Colors.primary}
                 />
 
                 <Text style={styles.checkboxLabel}>{category.label}</Text>
@@ -265,7 +265,7 @@ export default function ClosetScreen() {
                       : "square-outline"
                   }
                   size={22}
-                  color="#3F6473"
+                  color={Colors.primary}
                 />
 
                 <Text style={styles.checkboxLabel}>{season}</Text>
@@ -286,7 +286,7 @@ export default function ClosetScreen() {
         style={styles.addButton}
         onPress={() => router.push("/add-clothes")}
       >
-        <Ionicons name="add" size={32} color="white" />
+        <Ionicons name="add" size={32} color={Colors.white} />
       </TouchableOpacity>
     </View>
   );
@@ -308,6 +308,8 @@ const styles = StyleSheet.create({
   filterButton: {
     width: 38,
     height: 38,
+    borderRadius: 19,
+    backgroundColor: Colors.accent.lavenderLight,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -315,9 +317,9 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
     borderRadius: 22,
-    backgroundColor: "#E7E2DC",
-    borderWidth: 1,
-    borderColor: "#2F2F2F",
+    backgroundColor: Colors.accent.skyLight,
+    borderWidth: 1.5,
+    borderColor: Colors.accent.sky,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 14,
@@ -325,7 +327,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: "#2F2F2F",
+    color: Colors.text,
     paddingVertical: 0,
   },
   grid: {
@@ -339,15 +341,15 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     maxWidth: "31.8%",
-    backgroundColor: "white",
+    backgroundColor: Colors.card,
     borderRadius: 14,
     padding: 8,
     borderWidth: 1,
     borderColor: "transparent",
   },
   declutterCard: {
-    backgroundColor: "#FFF0EC",
-    borderColor: "#C45A4D",
+    backgroundColor: Colors.dangerLight,
+    borderColor: Colors.danger,
   },
   declutterBadge: {
     marginTop: 6,
@@ -355,7 +357,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 3,
-    backgroundColor: "#FFD8D0",
+    backgroundColor: Colors.warningLight,
     borderRadius: 999,
     paddingHorizontal: 7,
     paddingVertical: 3,
@@ -363,28 +365,29 @@ const styles = StyleSheet.create({
   declutterBadgeText: {
     fontSize: 10,
     fontWeight: "800",
-    color: "#8A2F24",
+    color: Colors.danger,
   },
   image: {
     width: "100%",
     aspectRatio: 1,
     borderRadius: 10,
-    backgroundColor: "#E8E1D8",
+    backgroundColor: Colors.cardSecondary,
   },
   name: {
     marginTop: 6,
     fontSize: 13,
     fontWeight: "600",
+    color: Colors.text,
   },
   date: {
     marginTop: 2,
     fontSize: 11,
-    color: "#777",
+    color: Colors.textSecondary,
   },
   emptyText: {
     textAlign: "center",
     marginTop: 40,
-    color: "#777",
+    color: Colors.textSecondary,
     fontSize: 15,
   },
   filterPanel: {
@@ -393,9 +396,9 @@ const styles = StyleSheet.create({
     left: 0,
     bottom: 0,
     width: "58%",
-    backgroundColor: "#F1EEE9",
+    backgroundColor: Colors.cardSecondary,
     borderRightWidth: 1,
-    borderColor: "#2F2F2F",
+    borderColor: Colors.border,
     paddingTop: 18,
     paddingHorizontal: 14,
     zIndex: 10,
@@ -414,10 +417,10 @@ const styles = StyleSheet.create({
   filterTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#2F2F2F",
+    color: Colors.text,
   },
   filterSection: {
-    backgroundColor: "white",
+    backgroundColor: Colors.card,
     borderRadius: 12,
     padding: 12,
     marginBottom: 12,
@@ -426,7 +429,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 8,
-    color: "#2F2F2F",
+    color: Colors.text,
   },
   checkboxRow: {
     flexDirection: "row",
@@ -436,18 +439,18 @@ const styles = StyleSheet.create({
   },
   checkboxLabel: {
     fontSize: 14,
-    color: "#2F2F2F",
+    color: Colors.text,
   },
   clearFiltersButton: {
     marginTop: 2,
     paddingVertical: 10,
     borderRadius: 10,
-    backgroundColor: "#D8CEC3",
+    backgroundColor: Colors.border,
     alignItems: "center",
   },
   clearFiltersText: {
     fontWeight: "600",
-    color: "#2F2F2F",
+    color: Colors.text,
   },
   addButton: {
     position: "absolute",
@@ -456,12 +459,17 @@ const styles = StyleSheet.create({
     width: 58,
     height: 58,
     borderRadius: 16,
-    backgroundColor: "#6B4F3F",
+    backgroundColor: Colors.primary,
     justifyContent: "center",
     alignItems: "center",
+    shadowColor: Colors.primaryDark,
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
   },
   logButton: {
-    backgroundColor: "#2f2f2f",
+    backgroundColor: Colors.success,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
@@ -469,7 +477,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logButtonText: {
-    color: "#fff",
+    color: Colors.white,
     fontWeight: "600",
   },
 });

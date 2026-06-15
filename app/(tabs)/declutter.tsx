@@ -1,4 +1,5 @@
 import LoadingScreen from "@/components/LoadingScreen";
+import { Colors, WeatherCardColors } from "@/constants/colors";
 import { WEATHER_FILTER_OPTIONS } from "@/constants/seasons";
 import { getClothingImageUrl } from "@/lib/clothing-images";
 import { supabase } from "@/lib/supabase";
@@ -148,7 +149,7 @@ export default function DeclutterScreen() {
   const keepItems = selectedItems.filter((item) => item.choice === "keep");
 
   if (loading) {
-    return <LoadingScreen color="#46342c" backgroundColor="#f8f1e8" />;
+    return <LoadingScreen />;
   }
 
   if (!selectedWeather) {
@@ -165,16 +166,30 @@ export default function DeclutterScreen() {
         </Text>
 
         <View style={styles.seasonGrid}>
-          {WEATHER_FILTER_OPTIONS.map((weather) => (
-            <TouchableOpacity
-              key={weather.value}
-              style={styles.seasonCard}
-              onPress={() => startWeatherSession(weather.value)}
-            >
-              <Ionicons name={weather.icon as any} size={28} color="#46342c" />
-              <Text style={styles.seasonText}>{weather.label}</Text>
-            </TouchableOpacity>
-          ))}
+          {WEATHER_FILTER_OPTIONS.map((weather) => {
+            const cardColor = WeatherCardColors[weather.value];
+
+            return (
+              <TouchableOpacity
+                key={weather.value}
+                style={[
+                  styles.seasonCard,
+                  cardColor && {
+                    backgroundColor: cardColor.bg,
+                    borderColor: cardColor.border,
+                  },
+                ]}
+                onPress={() => startWeatherSession(weather.value)}
+              >
+                <Ionicons
+                  name={weather.icon as any}
+                  size={28}
+                  color={cardColor?.icon ?? Colors.text}
+                />
+                <Text style={styles.seasonText}>{weather.label}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
     );
@@ -235,7 +250,7 @@ export default function DeclutterScreen() {
     <View style={styles.container}>
       <View style={styles.sessionHeader}>
         <TouchableOpacity onPress={resetDeclutterSession}>
-          <Ionicons name="chevron-back" size={26} color="#46342c" />
+          <Ionicons name="chevron-back" size={26} color={Colors.text} />
         </TouchableOpacity>
 
         <Text style={styles.progressText}>
@@ -282,7 +297,7 @@ export default function DeclutterScreen() {
           style={[styles.actionButton, styles.removeButton]}
           onPress={() => handleChoice("remove")}
         >
-          <Ionicons name="close" size={26} color="#fff" />
+          <Ionicons name="close" size={26} color={Colors.white} />
           <Text style={styles.actionText}>Weg</Text>
         </TouchableOpacity>
 
@@ -290,7 +305,7 @@ export default function DeclutterScreen() {
           style={[styles.actionButton, styles.maybeButton]}
           onPress={() => handleChoice("maybe")}
         >
-          <Ionicons name="help" size={26} color="#fff" />
+          <Ionicons name="help" size={26} color={Colors.white} />
           <Text style={styles.actionText}>Twijfel</Text>
         </TouchableOpacity>
 
@@ -298,7 +313,7 @@ export default function DeclutterScreen() {
           style={[styles.actionButton, styles.keepButton]}
           onPress={() => handleChoice("keep")}
         >
-          <Ionicons name="heart" size={26} color="#fff" />
+          <Ionicons name="heart" size={26} color={Colors.white} />
           <Text style={styles.actionText}>Houden</Text>
         </TouchableOpacity>
       </View>
@@ -329,7 +344,7 @@ function SummarySection({
   return (
     <View style={styles.summarySection}>
       <View style={styles.summaryHeader}>
-        <Ionicons name={icon as any} size={22} color="#46342c" />
+        <Ionicons name={icon as any} size={22} color={Colors.text} />
         <Text style={styles.summaryTitle}>
           {title} ({items.length})
         </Text>
@@ -363,7 +378,7 @@ function SummarySection({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f1e8",
+    backgroundColor: Colors.background,
   },
   content: {
     padding: 20,
@@ -371,25 +386,25 @@ const styles = StyleSheet.create({
   },
   center: {
     flex: 1,
-    backgroundColor: "#f8f1e8",
+    backgroundColor: Colors.background,
     justifyContent: "center",
     alignItems: "center",
   },
   smallTitle: {
     fontSize: 14,
-    color: "#8d6e63",
+    color: Colors.primary,
     fontWeight: "700",
     marginBottom: 6,
   },
   title: {
     fontSize: 30,
     fontWeight: "800",
-    color: "#46342c",
+    color: Colors.text,
     marginBottom: 10,
   },
   description: {
     fontSize: 16,
-    color: "#6f5a50",
+    color: Colors.textSecondary,
     lineHeight: 22,
     marginBottom: 24,
   },
@@ -400,18 +415,17 @@ const styles = StyleSheet.create({
   },
   seasonCard: {
     width: "47%",
-    backgroundColor: "#fffaf4",
+    backgroundColor: Colors.card,
     borderRadius: 22,
     padding: 20,
     minHeight: 120,
     justifyContent: "space-between",
-    borderWidth: 1,
-    borderColor: "#ead8c8",
+    borderWidth: 2,
   },
   seasonText: {
     fontSize: 18,
     fontWeight: "800",
-    color: "#46342c",
+    color: Colors.text,
     marginTop: 18,
   },
   sessionHeader: {
@@ -424,7 +438,7 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 15,
     fontWeight: "700",
-    color: "#6f5a50",
+    color: Colors.textSecondary,
   },
   cardContainer: {
     flex: 1,
@@ -433,12 +447,12 @@ const styles = StyleSheet.create({
     paddingBottom: 25,
   },
   declutterCard: {
-    backgroundColor: "#fffaf4",
+    backgroundColor: Colors.card,
     borderRadius: 28,
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#ead8c8",
-    shadowColor: "#000",
+    borderColor: Colors.border,
+    shadowColor: Colors.black,
     shadowOpacity: 0.1,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 7 },
@@ -447,7 +461,7 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: 210,
-    backgroundColor: "#ead8c8",
+    backgroundColor: Colors.cardSecondary,
   },
   cardContent: {
     padding: 16,
@@ -455,11 +469,11 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 24,
     fontWeight: "900",
-    color: "#46342c",
+    color: Colors.text,
     marginBottom: 12,
   },
   infoList: {
-    backgroundColor: "#f4e7da",
+    backgroundColor: Colors.warningLight,
     borderRadius: 16,
     padding: 12,
     gap: 8,
@@ -471,20 +485,20 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 13,
-    color: "#8d6e63",
+    color: Colors.textSecondary,
     fontWeight: "700",
   },
   infoValue: {
     flex: 1,
     textAlign: "right",
     fontSize: 13,
-    color: "#46342c",
+    color: Colors.text,
     fontWeight: "800",
   },
   callout: {
     marginTop: 12,
-    backgroundColor: "#46342c",
-    color: "#fffaf4",
+    backgroundColor: Colors.primary,
+    color: Colors.white,
     padding: 12,
     borderRadius: 16,
     fontSize: 14,
@@ -506,26 +520,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   removeButton: {
-    backgroundColor: "#b85c5c",
+    backgroundColor: Colors.danger,
   },
   maybeButton: {
-    backgroundColor: "#c99142",
+    backgroundColor: Colors.warning,
   },
   keepButton: {
-    backgroundColor: "#5f8d6a",
+    backgroundColor: Colors.success,
   },
   actionText: {
-    color: "#fff",
+    color: Colors.white,
     fontWeight: "800",
     marginTop: 2,
   },
   summarySection: {
-    backgroundColor: "#fffaf4",
+    backgroundColor: Colors.card,
     borderRadius: 22,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: "#ead8c8",
+    borderColor: Colors.border,
   },
   summaryHeader: {
     flexDirection: "row",
@@ -536,10 +550,10 @@ const styles = StyleSheet.create({
   summaryTitle: {
     fontSize: 20,
     fontWeight: "900",
-    color: "#46342c",
+    color: Colors.text,
   },
   emptyText: {
-    color: "#8d6e63",
+    color: Colors.textSecondary,
     fontWeight: "600",
   },
   summaryItem: {
@@ -548,48 +562,48 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: "#ead8c8",
+    borderTopColor: Colors.border,
   },
   summaryImage: {
     width: 58,
     height: 58,
     borderRadius: 14,
-    backgroundColor: "#ead8c8",
+    backgroundColor: Colors.cardSecondary,
   },
   summaryItemName: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#46342c",
+    color: Colors.text,
   },
   summaryItemInfo: {
-    color: "#8d6e63",
+    color: Colors.textSecondary,
     marginTop: 2,
   },
   adviceBox: {
-    backgroundColor: "#46342c",
+    backgroundColor: Colors.primary,
     borderRadius: 22,
     padding: 18,
     marginBottom: 18,
   },
   adviceTitle: {
-    color: "#fffaf4",
+    color: Colors.white,
     fontSize: 20,
     fontWeight: "900",
     marginBottom: 6,
   },
   adviceText: {
-    color: "#fffaf4",
+    color: Colors.white,
     fontSize: 15,
     lineHeight: 22,
   },
   primaryButton: {
-    backgroundColor: "#46342c",
+    backgroundColor: Colors.primary,
     borderRadius: 18,
     padding: 16,
     alignItems: "center",
   },
   primaryButtonText: {
-    color: "#fffaf4",
+    color: Colors.white,
     fontSize: 16,
     fontWeight: "900",
   },

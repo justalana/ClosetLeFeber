@@ -160,18 +160,21 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: "700",
     marginBottom: 24,
+    color: Colors.text,
   },
   label: {
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 8,
     marginTop: 16,
+    color: Colors.text,
   },
   input: {
     backgroundColor: Colors.white,
     padding: 14,
     borderRadius: 12,
     fontSize: 16,
+    color: Colors.text,
   },
   imageButton: {
     backgroundColor: Colors.white,
@@ -181,6 +184,7 @@ const styles = StyleSheet.create({
   },
   imageButtonText: {
     fontWeight: "600",
+    color: Colors.text,
   },
   preview: {
     width: 160,
