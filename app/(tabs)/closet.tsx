@@ -146,11 +146,7 @@ export default function ClosetScreen() {
           style={styles.filterButton}
           onPress={() => setFilterOpen(true)}
         >
-          <Ionicons
-            name="filter-outline"
-            size={28}
-            color={Colors.accent.lavender}
-          />
+          <Ionicons name="filter-outline" size={28} color={Colors.green} />
         </TouchableOpacity>
 
         <View style={styles.searchBox}>
@@ -251,7 +247,7 @@ export default function ClosetScreen() {
                       : "square-outline"
                   }
                   size={22}
-                  color={Colors.primary}
+                  color={Colors.green}
                 />
 
                 <Text style={styles.checkboxLabel}>{category.label}</Text>
@@ -275,7 +271,7 @@ export default function ClosetScreen() {
                       : "square-outline"
                   }
                   size={22}
-                  color={Colors.primary}
+                  color={Colors.green}
                 />
 
                 <Text style={styles.checkboxLabel}>{season}</Text>
@@ -319,7 +315,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: Colors.accent.lavenderLight,
+    backgroundColor: Colors.greenLight,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -327,9 +323,9 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
     borderRadius: 22,
-    backgroundColor: Colors.accent.skyLight,
+    backgroundColor: Colors.card,
     borderWidth: 1.5,
-    borderColor: Colors.accent.sky,
+    borderColor: Colors.border,
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 14,
@@ -362,6 +358,7 @@ const styles = StyleSheet.create({
   declutterCard: {
     backgroundColor: Colors.dangerLight,
     borderColor: Colors.danger,
+    borderWidth: 1,
   },
   declutterBadge: {
     marginTop: 6,
@@ -483,7 +480,7 @@ const styles = StyleSheet.create({
   },
   logButton: {
     marginTop: 12,
-    backgroundColor: Colors.success,
+    backgroundColor: Colors.green,
     paddingVertical: 8,
     borderRadius: 8,
     alignItems: "center",

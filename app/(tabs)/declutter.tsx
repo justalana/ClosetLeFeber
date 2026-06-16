@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
   },
   smallTitle: {
     fontSize: 14,
-    color: Colors.primary,
+    color: Colors.green,
     fontWeight: "700",
     marginBottom: 6,
   },
@@ -526,7 +526,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.warning,
   },
   keepButton: {
-    backgroundColor: Colors.success,
+    backgroundColor: Colors.green,
   },
   actionText: {
     color: Colors.white,

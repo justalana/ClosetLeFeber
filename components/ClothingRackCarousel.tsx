@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   card: {
     width: ITEM_WIDTH,
     height: 210,
-    backgroundColor: Colors.accent.peachLight,
+    backgroundColor: Colors.cardSecondary,
     borderRadius: 26,
     borderWidth: 2,
     borderColor: Colors.border,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   selectedCard: {
     borderColor: Colors.primary,
     borderWidth: 3,
-    backgroundColor: Colors.accent.peachLight,
+    backgroundColor: Colors.primaryLight,
   },
 
   image: {

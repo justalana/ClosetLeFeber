@@ -1,7 +1,7 @@
 import LoadingScreen from "@/components/LoadingScreen";
 import MentionCard from "@/components/MentionCard";
 import { HOME_CATEGORIES } from "@/constants/categories";
-import { CategoryColors, Colors } from "@/constants/colors";
+import { Colors } from "@/constants/colors";
 import { getClothingImageUrl } from "@/lib/clothing-images";
 import { supabase } from "@/lib/supabase";
 import { ClothingItem } from "@/types/clothing";
@@ -98,7 +98,7 @@ export default function HomeScreen() {
       </View>
 
       <View style={[styles.section, styles.forgottenSection]}>
-        <Text style={[styles.sectionTitle, styles.peachTitle]}>
+        <Text style={[styles.sectionTitle, styles.forgottenTitle]}>
           Vergeet mij niet :(
         </Text>
 
@@ -136,16 +136,14 @@ export default function HomeScreen() {
 
         <View style={styles.categoriesRow}>
           {HOME_CATEGORIES.map((category) => {
-            const catColor = CategoryColors[category.value];
-
             return (
               <TouchableOpacity
                 key={category.value}
                 style={[
                   styles.categoryButton,
-                  catColor && {
-                    backgroundColor: catColor.bg,
-                    borderColor: catColor.border,
+                  {
+                    backgroundColor: Colors.cardSecondary,
+                    borderColor: Colors.greenMuted,
                   },
                 ]}
                 onPress={() => goToCategory(category.value)}
@@ -169,7 +167,7 @@ export default function HomeScreen() {
             item={mostWornItem}
             label="Favoriet"
             emoji="⭐"
-            tint="honey"
+            tint="calm"
             onPress={() =>
               mostWornItem && router.push(`/clothing/${mostWornItem.id}` as any)
             }
@@ -179,7 +177,7 @@ export default function HomeScreen() {
             item={leastWornItem}
             label="Minst gedragen"
             emoji="☹️"
-            tint="lavender"
+            tint="favorite"
             onPress={() =>
               leastWornItem &&
               router.push(`/clothing/${leastWornItem.id}` as any)
@@ -223,13 +221,13 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   forgottenSection: {
-    backgroundColor: Colors.accent.peachLight,
+    backgroundColor: Colors.greenLight,
     marginHorizontal: 20,
     paddingHorizontal: 20,
     paddingVertical: 18,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: Colors.accent.peach,
+    borderColor: Colors.greenMuted,
   },
   sectionTitle: {
     fontSize: 16,
@@ -237,8 +235,8 @@ const styles = StyleSheet.create({
     color: Colors.text,
     marginBottom: 10,
   },
-  peachTitle: {
-    color: Colors.accent.peach,
+  forgottenTitle: {
+    color: Colors.brown,
   },
   forgottenRow: {
     flexDirection: "row",
@@ -251,7 +249,7 @@ const styles = StyleSheet.create({
     height: 78,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: Colors.accent.peach,
+    borderColor: Colors.greenMuted,
     backgroundColor: Colors.white,
     overflow: "hidden",
   },

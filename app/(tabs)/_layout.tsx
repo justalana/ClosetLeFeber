@@ -39,7 +39,7 @@ export default function TabLayout() {
               <Ionicons
                 name="person-circle-outline"
                 size={30}
-                color={Colors.accent.sky}
+                color={Colors.brownLight}
               />
             </TouchableOpacity>
           </View>

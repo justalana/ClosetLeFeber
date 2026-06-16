@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 30,
     fontWeight: "900",
-    color: Colors.primary,
+    color: Colors.text,
   },
   subtitle: {
     marginTop: 6,
@@ -210,9 +210,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 24,
     padding: 24,
     borderRadius: 24,
-    backgroundColor: Colors.accent.lavenderLight,
-    borderWidth: 2,
-    borderColor: Colors.accent.lavender,
+    backgroundColor: Colors.greenLight,
+    borderWidth: 1,
+    borderColor: Colors.greenMuted,
   },
   emptyTitle: {
     fontSize: 20,

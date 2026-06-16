@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     width: "100%",
     minHeight: 2,
     borderRadius: 999,
-    backgroundColor: Colors.accent.peach,
+    backgroundColor: Colors.green,
   },
   label: {
     fontSize: 10,

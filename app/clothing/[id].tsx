@@ -1,6 +1,6 @@
 import LoadingScreen from "@/components/LoadingScreen";
-import { Colors } from "@/constants/colors";
 import WearChart from "@/components/WearChart";
+import { Colors } from "@/constants/colors";
 import { getClothingImageUrl } from "@/lib/clothing-images";
 import { logClothingWear } from "@/lib/log-clothing-wear";
 import { supabase } from "@/lib/supabase";
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   logButton: {
-    backgroundColor: Colors.success,
+    backgroundColor: Colors.green,
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
