@@ -3,6 +3,7 @@ import MentionCard from "@/components/MentionCard";
 import { HOME_CATEGORIES } from "@/constants/categories";
 import { Colors } from "@/constants/colors";
 import { getClothingImageUrl } from "@/lib/clothing-images";
+import { getDisplayName } from "@/lib/get-display-name";
 import { supabase } from "@/lib/supabase";
 import { ClothingItem } from "@/types/clothing";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -41,13 +42,7 @@ export default function HomeScreen() {
 
       if (!user) return;
 
-      const name =
-        user.user_metadata?.full_name ||
-        user.user_metadata?.name ||
-        user.email?.split("@")[0] ||
-        "daar";
-
-      setUserName(name);
+      setUserName(getDisplayName(user));
 
       const { data, error } = await supabase
         .from("clothes")
