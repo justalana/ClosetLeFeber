@@ -146,7 +146,11 @@ export default function ClosetScreen() {
           style={styles.filterButton}
           onPress={() => setFilterOpen(true)}
         >
-          <Ionicons name="filter-outline" size={28} color={Colors.accent.lavender} />
+          <Ionicons
+            name="filter-outline"
+            size={28}
+            color={Colors.accent.lavender}
+          />
         </TouchableOpacity>
 
         <View style={styles.searchBox}>
@@ -184,20 +188,26 @@ export default function ClosetScreen() {
               style={styles.image}
             />
 
-            <Text style={styles.name} numberOfLines={1}>
-              {item.name || "Naamloos kledingstuk"}
-            </Text>
+            <View style={styles.cardContent}>
+              <Text style={styles.name} numberOfLines={1}>
+                {item.name || "Naamloos kledingstuk"}
+              </Text>
 
-            {item.marked_for_declutter && (
-              <View style={styles.declutterBadge}>
-                <Ionicons name="basket-outline" size={12} color={Colors.danger} />
-                <Text style={styles.declutterBadgeText}>Declutter</Text>
-              </View>
-            )}
+              {item.marked_for_declutter && (
+                <View style={styles.declutterBadge}>
+                  <Ionicons
+                    name="basket-outline"
+                    size={12}
+                    color={Colors.danger}
+                  />
+                  <Text style={styles.declutterBadgeText}>Declutter</Text>
+                </View>
+              )}
 
-            <Text style={styles.date}>
-              Laatst gedragen: {formatLastWornDate(item.last_worn ?? null)}
-            </Text>
+              <Text style={styles.date}>
+                Laatst gedragen: {formatLastWornDate(item.last_worn ?? null)}
+              </Text>
+            </View>
 
             <TouchableOpacity
               style={styles.logButton}
@@ -341,11 +351,13 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     maxWidth: "31.8%",
+    minHeight: 240,
     backgroundColor: Colors.card,
     borderRadius: 14,
     padding: 8,
-    borderWidth: 1,
-    borderColor: "transparent",
+  },
+  cardContent: {
+    flex: 1,
   },
   declutterCard: {
     backgroundColor: Colors.dangerLight,
@@ -378,6 +390,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
     color: Colors.text,
+    // minHeight: 32,
   },
   date: {
     marginTop: 2,
@@ -469,11 +482,10 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   logButton: {
+    marginTop: 12,
     backgroundColor: Colors.success,
     paddingVertical: 8,
-    paddingHorizontal: 12,
     borderRadius: 8,
-    marginTop: 8,
     alignItems: "center",
   },
   logButtonText: {
