@@ -20,11 +20,12 @@ import {
 export default function HomeScreen() {
   const router = useRouter();
 
-  const [userName, setUserName] = useState("daar");
+  const [userName, setUserName] = useState("jij");
   const [leastWorn, setLeastWorn] = useState<ClothingItem[]>([]);
   const [mostWornItem, setMostWornItem] = useState<ClothingItem | null>(null);
   const [leastWornItem, setLeastWornItem] = useState<ClothingItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const [quote, setQuote] = useState("Kleine stapjes geven ook overzicht.");
 
   useFocusEffect(
     useCallback(() => {
@@ -43,6 +44,19 @@ export default function HomeScreen() {
       if (!user) return;
 
       setUserName(getDisplayName(user));
+
+      const { data: quoteData, error: quoteError } = await supabase
+        .from("quotes")
+        .select("quote");
+
+      if (quoteError) throw quoteError;
+
+      if (quoteData && quoteData.length > 0) {
+        const randomQuote =
+          quoteData[Math.floor(Math.random() * quoteData.length)];
+
+        setQuote(randomQuote.quote);
+      }
 
       const { data, error } = await supabase
         .from("clothes")
@@ -89,7 +103,7 @@ export default function HomeScreen() {
         <Text style={styles.title}>
           Hey <Text style={styles.titleAccent}>{userName}</Text> !
         </Text>
-        <Text style={styles.quote}>Kleine stapjes geven ook overzicht.</Text>
+        <Text style={styles.quote}>{quote}</Text>
       </View>
 
       <View style={[styles.section, styles.forgottenSection]}>
@@ -210,6 +224,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     marginTop: 4,
+    textAlign: "center",
+    paddingHorizontal: 30,
+    lineHeight: 20,
   },
   section: {
     paddingHorizontal: 28,

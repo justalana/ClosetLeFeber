@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-    paddingBottom: 40,
+    paddingBottom: 50,
   },
   center: {
     flex: 1,
@@ -330,6 +330,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
+    paddingTop: 10,
   },
   editButton: {
     width: 42,

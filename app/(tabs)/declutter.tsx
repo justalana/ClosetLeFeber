@@ -158,7 +158,6 @@ export default function DeclutterScreen() {
         style={styles.container}
         contentContainerStyle={styles.content}
       >
-        <Text style={styles.smallTitle}>Declutter Mode</Text>
         <Text style={styles.title}>Welke kleding wil je opruimen?</Text>
         <Text style={styles.description}>
           Kies een weersoort. De app toont daarna vooral kleding die je weinig
@@ -201,9 +200,6 @@ export default function DeclutterScreen() {
         style={styles.container}
         contentContainerStyle={styles.content}
       >
-        <Text style={styles.smallTitle}>Sessie klaar</Text>
-        <Text style={styles.title}>Dit is je declutter lijst</Text>
-
         <SummarySection
           title="Wegdoen"
           icon="trash-outline"
@@ -382,7 +378,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-    paddingBottom: 40,
+    paddingBottom: 25,
   },
   center: {
     flex: 1,
@@ -580,19 +576,21 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   adviceBox: {
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.card,
     borderRadius: 22,
     padding: 18,
     marginBottom: 18,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   adviceTitle: {
-    color: Colors.white,
+    color: Colors.brown,
     fontSize: 20,
     fontWeight: "900",
     marginBottom: 6,
   },
   adviceText: {
-    color: Colors.white,
+    color: Colors.brown,
     fontSize: 15,
     lineHeight: 22,
   },

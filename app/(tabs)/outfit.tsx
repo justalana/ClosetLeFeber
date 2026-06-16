@@ -1,5 +1,5 @@
-import LoadingScreen from "@/components/LoadingScreen";
 import ClothingRackCarousel from "@/components/ClothingRackCarousel";
+import LoadingScreen from "@/components/LoadingScreen";
 import { Colors } from "@/constants/colors";
 import { logClothingWear } from "@/lib/log-clothing-wear";
 import { supabase } from "@/lib/supabase";
@@ -114,7 +114,6 @@ export default function OutfitScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.pageTitle}>Outfit Generator</Text>
           <Text style={styles.subtitle}>
             Deze kledingstukken verdienen vandaag wat aandacht.
           </Text>
@@ -162,8 +161,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   content: {
-    paddingTop: 64,
-    paddingBottom: 120,
+    paddingBottom: 25,
   },
   header: {
     paddingHorizontal: 24,

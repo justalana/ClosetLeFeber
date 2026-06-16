@@ -100,7 +100,7 @@ export default function AddClothesScreen() {
   }
 
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.container}>
         <Text style={styles.title}>Kledingstuk toevoegen</Text>
 
@@ -151,10 +151,14 @@ export default function AddClothesScreen() {
 }
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     padding: 24,
     backgroundColor: Colors.background,
+    paddingBottom: 50,
   },
   title: {
     fontSize: 26,

@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 24,
-    paddingBottom: 40,
+    paddingBottom: 25,
   },
   backButton: {
     width: 42,
