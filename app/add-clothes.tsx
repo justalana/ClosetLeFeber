@@ -78,20 +78,23 @@ export default function AddClothesScreen() {
         imageUrl = data.publicUrl;
       }
 
-      const { error } = await supabase.from("clothes").insert({
-        user_id: user.id,
-        name,
-        category,
-        season,
-        image_url: imageUrl,
-      });
+      const { data, error } = await supabase
+        .from("clothes")
+        .insert({
+          user_id: user.id,
+          name,
+          category,
+          season,
+          image_url: imageUrl,
+        })
+        .select("id")
+        .single();
 
       if (error) {
         throw error;
       }
 
-      Alert.alert("Opgeslagen", "Kledingstuk toegevoegd!");
-      router.push("/closet");
+      router.replace(`/clothing/${data.id}` as any);
     } catch (error: any) {
       Alert.alert("Fout", error.message);
     } finally {

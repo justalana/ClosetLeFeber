@@ -1,5 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Colors } from "@/constants/colors";
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs, router } from "expo-router";
 import { Image, Platform, TouchableOpacity, View } from "react-native";
 
@@ -54,7 +54,7 @@ export default function TabLayout() {
           borderTopColor: Colors.border,
 
           height: Platform.OS === "android" ? 90 : 75,
-          paddingBottom: Platform.OS === "android" ? 24 : 12,
+          paddingBottom: Platform.OS === "android" ? 50 : 12,
           paddingTop: 8,
         },
       }}

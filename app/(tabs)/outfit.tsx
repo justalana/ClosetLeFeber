@@ -92,11 +92,6 @@ export default function OutfitScreen() {
       const bottomResult = await logClothingWear(selectedBottom.id);
       if (bottomResult.error) throw new Error(bottomResult.error);
 
-      Alert.alert(
-        "Outfit gelogd",
-        "Deze kledingstukken zijn eindelijk weer uit de kast gehaald.",
-      );
-
       loadOutfitItems();
     } catch (error) {
       console.log(error);

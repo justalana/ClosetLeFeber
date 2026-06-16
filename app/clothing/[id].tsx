@@ -119,7 +119,6 @@ export default function ClothingDetailScreen() {
       return;
     }
 
-    Alert.alert("Gelukt", "Kledingstuk is gelogd.");
     loadItem();
   }
 

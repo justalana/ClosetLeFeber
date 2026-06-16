@@ -132,7 +132,6 @@ export default function ClosetScreen() {
     }
 
     loadClothes();
-    alert("Kledingstuk gelogd!");
   }
 
   if (loading) {
