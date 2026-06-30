@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { ClothingItem } from "@/types/clothing";
 import { getDaysSince, getLastWornRelative } from "@/utils/dates";
 import { Ionicons } from "@expo/vector-icons";
-import { useFocusEffect } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
 import {
   Image,
@@ -223,6 +223,13 @@ export default function DeclutterScreen() {
             </Text>
           </View>
         )}
+
+        <TouchableOpacity
+          style={styles.adviceButton}
+          onPress={() => router.push("/declutter/advice" as any)}
+        >
+          <Text style={styles.adviceButtonText}>Bekijk advies</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.primaryButton}
@@ -585,5 +592,21 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontSize: 16,
     fontWeight: "900",
+  },
+  adviceButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: Colors.primary,
+    paddingVertical: 13,
+    borderRadius: 16,
+    marginBottom: 22,
+  },
+
+  adviceButtonText: {
+    color: Colors.white,
+    fontWeight: "900",
+    fontSize: 15,
   },
 });

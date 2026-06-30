@@ -111,6 +111,14 @@ export default function DeclutterBasketScreen() {
         kunt ze eerst in een tas stoppen en later definitief uit je kast halen.
       </Text>
 
+      <TouchableOpacity
+        style={styles.adviceButton}
+        onPress={() => router.push("/declutter/advice" as any)}
+      >
+        <Ionicons name="bulb-outline" size={20} color={Colors.white} />
+        <Text style={styles.adviceButtonText}>Bekijk declutter advies</Text>
+      </TouchableOpacity>
+
       {items.length === 0 ? (
         <View style={styles.emptyCard}>
           <Ionicons name="basket-outline" size={42} color={Colors.primary} />
@@ -275,5 +283,21 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontWeight: "800",
     fontSize: 12,
+  },
+  adviceButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: Colors.primary,
+    paddingVertical: 13,
+    borderRadius: 16,
+    marginBottom: 22,
+  },
+
+  adviceButtonText: {
+    color: Colors.white,
+    fontWeight: "900",
+    fontSize: 15,
   },
 });
