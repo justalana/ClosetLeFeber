@@ -1,50 +1,190 @@
-# Welcome to your Expo app 👋
+# LeCloset
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+LeCloset is een mobiele applicatie die mensen met ADHD helpt om meer overzicht en rust te creëren in hun kledingkast. Door kledingstukken te registreren en het draaggedrag bij te houden, helpt de app gebruikers om vaker ongebruikte kleding te dragen en eenvoudiger te declutteren.
 
-## Get started
+---
 
-1. Install dependencies
+## Over het project
 
-   ```bash
-   npm install
-   ```
+Mensen met ADHD ervaren regelmatig keuzestress en overzichtsproblemen bij het uitzoeken van kleding. Hierdoor worden vaak dezelfde kledingstukken gedragen, terwijl andere kleding jarenlang ongebruikt in de kast blijven hangen.
 
-2. Start the app
+LeCloset biedt een eenvoudige oplossing door:
 
-   ```bash
-   npx expo start
-   ```
+* Het registreren van kledingstukken.
+* Bijhouden hoe vaak kleding gedragen wordt.
+* Suggesties te geven op basis van minst gedragen kleding.
+* Gebruikers te helpen bij het declutteren van hun kledingkast.
+* Advies te geven over wat er met ongebruikte kleding kan worden gedaan.
 
-In the output, you'll find options to open the app in a
+Het doel is niet om complete outfits voor de gebruiker te kiezen, maar juist om de keuze makkelijker te maken zonder extra prikkels te creëren.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Functionaliteiten
 
-## Get a fresh project
+### Kledingkast beheren
 
-When you're ready, run:
+* Kleding toevoegen
+* Foto maken of uploaden
+* Kleding bewerken
+* Kleding verwijderen
+* Zoeken op naam
+* Filteren op categorie
+* Filteren op warm/koud weer
 
-```bash
-npm run reset-project
+### Draaggedrag
+
+* Registreren wanneer kleding gedragen is
+* Automatisch bijhouden van:
+
+  * Laatste draagdatum
+  * Aantal keer gedragen
+* Overzicht van meest en minst gedragen kleding
+
+### Outfitondersteuning
+
+* Suggesties op basis van de minst gedragen tops
+* Suggesties op basis van de minst gedragen bottoms
+* Zelf eenvoudig een combinatie maken
+
+### Declutter
+
+* Detecteren van kleding die lang niet gedragen is
+* Decluttermandje
+* Adviespagina met mogelijkheden zoals:
+
+  * Doneren
+  * Verkopen
+  * Recyclen
+  * Upcyclen
+
+### Statistieken
+
+* Draaggeschiedenis per kledingstuk
+* Grafiek van draagmomenten
+* Favoriete kledingstukken
+* Vergeet-mij-nietjes (minst gedragen kleding)
+
+---
+
+## Technologie
+
+### Front-end
+
+* React Native
+* Expo
+* Expo Router
+* TypeScript
+
+### Back-end
+
+* Supabase
+* PostgreSQL Database
+* Supabase Storage
+
+### Testing
+
+* Jest
+
+---
+
+## Projectstructuur
+
+```
+app/
+components/
+constants/
+hooks/
+lib/
+supabase/
+types/
+assets/
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## Installatie
 
-To learn more about developing your project with Expo, look at the following resources:
+### Repository clonen
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+git clone https://github.com/<username>/LeCloset.git
+cd LeCloset
+```
 
-## Join the community
+### Dependencies installeren
 
-Join our community of developers creating universal apps.
+```bash
+npm install
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Environment variables
+
+Maak een `.env` bestand aan en voeg de volgende gegevens toe:
+
+```env
+EXPO_PUBLIC_SUPABASE_URL=your_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_key
+```
+
+### Applicatie starten
+
+```bash
+npx expo start
+```
+
+Daarna kan de app worden geopend via:
+
+* Expo Go
+* Android Emulator
+* iOS Simulator
+
+---
+
+## Testen
+
+Alle unit tests uitvoeren:
+
+```bash
+npm test
+```
+
+---
+
+## Doelgroep
+
+LeCloset is ontwikkeld voor mensen met ADHD die moeite hebben met:
+
+* Overzicht houden in hun kledingkast
+* Keuzes maken
+* Vergeetachtigheid
+* Impulsief kleding kopen
+* Het regelmatig dragen van dezelfde kleding
+
+---
+
+## Toekomstige uitbreidingen
+
+* Weersinformatie koppelen
+* Outfitplanning
+* AI-herkenning van kleding
+* Barcode of kledinglabel scannen
+* Persoonlijke reminders
+* Kalenderoverzicht
+* Kledingcombinaties opslaan
+* Synchronisatie tussen meerdere apparaten
+
+---
+
+## Ontwikkelaar
+
+**Alana le Feber**
+
+Creative Media & Game Technologies
+Hogeschool Rotterdam
+
+---
+
+## Licentie
+
+Dit project is ontwikkeld als schoolproject voor de opleiding Creative Media & Game Technologies aan de Hogeschool Rotterdam.
