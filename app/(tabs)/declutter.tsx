@@ -17,7 +17,7 @@ import {
   View,
 } from "react-native";
 
-type DeclutterChoice = "keep" | "maybe" | "remove";
+type DeclutterChoice = "keep" | "remove";
 
 type SelectedItem = ClothingItem & {
   choice: DeclutterChoice;
@@ -145,7 +145,6 @@ export default function DeclutterScreen() {
   }
 
   const removeItems = selectedItems.filter((item) => item.choice === "remove");
-  const maybeItems = selectedItems.filter((item) => item.choice === "maybe");
   const keepItems = selectedItems.filter((item) => item.choice === "keep");
 
   if (loading) {
@@ -205,13 +204,6 @@ export default function DeclutterScreen() {
           icon="trash-outline"
           items={removeItems}
           emptyText="Geen items gekozen om weg te doen."
-        />
-
-        <SummarySection
-          title="Twijfel"
-          icon="help-circle-outline"
-          items={maybeItems}
-          emptyText="Geen twijfel-items."
         />
 
         <SummarySection
@@ -295,14 +287,6 @@ export default function DeclutterScreen() {
         >
           <Ionicons name="close" size={26} color={Colors.white} />
           <Text style={styles.actionText}>Weg</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.actionButton, styles.maybeButton]}
-          onPress={() => handleChoice("maybe")}
-        >
-          <Ionicons name="help" size={26} color={Colors.white} />
-          <Text style={styles.actionText}>Twijfel</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -503,10 +487,10 @@ const styles = StyleSheet.create({
   },
   actions: {
     flexDirection: "row",
+    gap: 16,
     justifyContent: "space-around",
     paddingHorizontal: 20,
     paddingBottom: 28,
-    gap: 10,
   },
   actionButton: {
     flex: 1,
@@ -517,9 +501,6 @@ const styles = StyleSheet.create({
   },
   removeButton: {
     backgroundColor: Colors.danger,
-  },
-  maybeButton: {
-    backgroundColor: Colors.warning,
   },
   keepButton: {
     backgroundColor: Colors.green,
